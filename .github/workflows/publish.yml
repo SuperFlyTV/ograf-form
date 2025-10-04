@@ -23,6 +23,11 @@ jobs:
           yarn install
         env:
           CI: true
+      - name: Build
+        run: |
+          yarn build
+        env:
+          CI: true
       - name: Publish to NPM
         run: |
           echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
