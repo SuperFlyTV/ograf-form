@@ -10,6 +10,8 @@ npm install ograf-form
 
 Example usage:
 
+_[See examples folder for more examples.](./examples)._
+
 ```html
 <!DOCTYPE html>
 <html>

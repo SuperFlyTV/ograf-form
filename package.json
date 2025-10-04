@@ -10,15 +10,21 @@
     "email": "johan@superfly.tv"
   },
   "homepage": "https://github.com/SuperFlyTV/ograf-form",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SuperFlyTV/ograf-form"
+  },
   "scripts": {
     "release": "commit-and-tag-version",
     "dev": "vite",
     "build": "tsc && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "http-server": "http-server -p 8085"
   },
   "devDependencies": {
     "@types/json-schema": "^7.0.15",
     "commit-and-tag-version": "^12.6.0",
+    "http-server": "^14.1.1",
     "ograf": "^0.0.5",
     "typescript": "~5.8.3",
     "vite": "^7.1.7"
