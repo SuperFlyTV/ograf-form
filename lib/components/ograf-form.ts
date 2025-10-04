@@ -1,5 +1,7 @@
+import { isEqual } from "../lib/lib.js";
 import type { GDDSchema } from "../lib/types.js";
 import { validateGDDSchema } from "../lib/validate-schema.js";
+import { getDefaultDataFromSchema } from "../main.js";
 import { GDDElementBase, getGDDElement } from "./gdd-elements/index.js";
 import type { Dictionary } from "./gdd-elements/lib/lib.js";
 
@@ -17,6 +19,17 @@ export class SuperFlyTvOgrafDataForm extends HTMLElement {
   connectedCallback(): void {
     this.appendChild(this.elError);
 
+    // Check this.data attribute, set to default if not present:
+    if (this.schema !== null && this.data === null) {
+      const newData = getDefaultDataFromSchema(this.schema);
+
+      if (!isEqual(this.data, newData)) {
+        this.data = newData;
+        // Emit onChange event, so that any listeners are aware of the new data:
+        this.dispatchEvent(GDDElementBase.getOnChangeEvent(this.data));
+      }
+    }
+
     this.render();
   }
   static get observedAttributes() {
@@ -32,6 +45,7 @@ export class SuperFlyTvOgrafDataForm extends HTMLElement {
   }
   get data(): any | null {
     const data = this.getAttribute("data");
+    if (data === "") return null;
     if (typeof data === "string") return JSON.parse(data);
     return data;
   }
@@ -66,7 +80,7 @@ export class SuperFlyTvOgrafDataForm extends HTMLElement {
     }
   }
   onDataUpdated(data: unknown) {
-    const event = new CustomEvent("data", {
+    const event = new CustomEvent("data-updated", {
       bubbles: true,
       cancelable: false,
       detail: { data },
@@ -98,7 +112,7 @@ export class SuperFlyTvOgrafDataForm extends HTMLElement {
       if (this.schema) {
         this.elContent = getGDDElement(this.schema, "data");
         this.elForm.appendChild(this.elContent);
-        this.elContent.addEventListener("data", (data) => {
+        this.elContent.addEventListener("data-updated", (data) => {
           this.onDataUpdated(data);
         });
       }

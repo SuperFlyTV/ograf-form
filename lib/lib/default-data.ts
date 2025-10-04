@@ -22,12 +22,10 @@ function _getDefaultDataFromSchema(
         dataObject[subKey],
         key + "." + subKey
       );
-      // console.log("subData", key + "." + subKey, subData);
       if (subData !== undefined) {
         dataObject[subKey] = subData;
       }
     }
-    // console.log("dataObject", key, dataObject);
     return dataObject;
   } else if (gddSchema.type === "array") {
     const dataArray = clone(prefilledData ?? gddSchema.default ?? []);

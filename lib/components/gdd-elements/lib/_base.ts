@@ -29,13 +29,16 @@ export abstract class GDDElementBase extends HTMLElement {
   /** Returns true on initial render */
   abstract render(): boolean;
 
-  protected emitOnChange(data: any) {
-    const event = new CustomEvent("onChange", {
+  static getOnChangeEvent(data: any) {
+    return new CustomEvent("onChange", {
       bubbles: true,
       cancelable: false,
       detail: { data },
     });
-    this.dispatchEvent(event);
+  }
+
+  protected emitOnChange(data: any) {
+    this.dispatchEvent(GDDElementBase.getOnChangeEvent(data));
   }
 
   protected emitOnKeyDown(e: Event, inputStr: string, data: any) {
