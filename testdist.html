@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ogra-form</title>
+  </head>
+  <body>
+    <div id="form-container" style="width: 100vw"></div>
+    <div id="data" style="white-space: pre"></div>
+    <script type="module" type="text/javascript">
+
+
+      const OgrafForm = await import("/dist/main.js");
+
+
+      const container = document.getElementById("form-container");
+        const dataDiv = document.getElementById("data");
+
+      const exampleTable = {
+        type: "object",
+        properties: {
+          name: {
+            type: "string",
+            gddType: "single-line",
+            default: "My Table",
+            description: "This is the name of the thing",
+          },
+
+          table: {
+            description: "this is a nice table!",
+            type: "array",
+            items: {
+              type: "object",
+              properties: {
+                name: {
+                  type: "string",
+                  gddType: "single-line",
+                  default: "New Name",
+                  title: "Name",
+                  description: "The name of the person",
+                },
+                age: {
+                  type: "integer",
+                  default: 30,
+                },
+                age2: {
+                  type: "number",
+                  default: 30.5,
+                },
+                isActive: {
+                  type: "boolean",
+                  gddType: "select",
+                  gddOptions: {
+                    labels: {
+                      true: "Active",
+                      false: "Inactive",
+                    },
+                  },
+                },
+              },
+            },
+            default: [
+              {
+                name: "Alice",
+                age: 28,
+                isActive: true,
+              },
+              {
+                name: "Bob",
+                age: 35,
+                isActive: false,
+              },
+            ],
+          },
+        },
+      };
+
+      function renderSchema(schema) {
+
+
+        const data = OgrafForm.getDefaultDataFromSchema(schema);
+
+        const form = new OgrafForm.SuperFlyTvOgrafDataForm();
+        form.addEventListener("onChange", (e) => {
+          console.log("Caught onChange event", JSON.stringify(e.detail));
+
+          dataDiv.innerHTML = JSON.stringify(e.detail.data, null, 2);
+        });
+        form.addEventListener("onKeyUp", (e) => {
+          console.log("Caught onKey event", JSON.stringify(e.detail));
+          // dataDiv.innerHTML = JSON.stringify(e.detail.data, null, 2);
+        });
+        form.schema = schema;
+        form.data = data;
+
+        dataDiv.innerHTML = JSON.stringify(data, null, 2);
+
+        container.appendChild(form);
+      }
+
+      renderSchema(exampleTable);
+    </script>
+  </body>
+</html>
