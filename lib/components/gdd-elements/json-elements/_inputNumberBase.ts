@@ -15,7 +15,6 @@ export abstract class GDDInputNumberBase extends GDDInputBase {
         if (!(e.target instanceof HTMLInputElement)) return;
 
         const input = e.target.value;
-        // console.log("onchange", input);
         const value = this._parseInput(input);
         if (value === null) {
           // invalid input, revert

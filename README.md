@@ -8,61 +8,48 @@ This is a Web Component for generating input forms from [OGraf/GDD](https://ogra
 npm install ograf-form
 ```
 
-Example usage:
+Or you can use a CDN: `https://cdn.jsdelivr.net/npm/ograf-form/dist/main.js);`
 
-_[See examples folder for more examples.](./examples)._
+### Example usage
+
+- How to use directly in html: [Code](/blob/main/examples/html.html), [Live Example](https://html-preview.github.io/?url=https://github.com/SuperFlyTV/ograf-form/blob/main/examples/html.html).
+- How to use with javascript: [Code](/blob/main/examples/javascript.html), [Live Example](https://html-preview.github.io/?url=https://github.com/SuperFlyTV/ograf-form/blob/main/examples/javascript.html).
+- How to use with React: [Code](/blob/main/examples/react.jsx).
+
+### Example implementation
 
 ```html
 <!DOCTYPE html>
 <html>
   <body>
-    <div id="form-container" style="width: 100vw"></div>
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/ograf-form/dist/main.js"
+    ></script>
+    <!-- <script type="module" src="/dist/main.js"></script> -->
+
+    <div id="form-container" style="width: 100vw">
+      <superflytv-ograf-form
+        id="ograf-form"
+        schema='{"type":"object","properties":{"name":{"type":"string","gddType":"single-line","default":"John Doe","description":"This is the name of the thing"}}}'
+      ></superflytv-ograf-form>
+    </div>
     <div id="data" style="white-space: pre"></div>
-    <script type="module" type="text/javascript">
 
-      const container = document.getElementById("form-container");
+    <script type="text/javascript">
+      // Listen to changes:
+      const form = document.getElementById("ograf-form");
       const dataDiv = document.getElementById("data");
-
-      // Load the library, either from CDN or locally:
-      const OgrafForm = await import("https://cdn.jsdelivr.net/npm/ograf-form/dist/my-lib.js");
-      // const OgrafForm = await import("ograf-form");
-
-      // Define a OGraf/GDD JSON-schema:
-      const exampleSchema = {
-        type: "object",
-        properties: {
-          name: {
-            type: "string",
-            gddType: "single-line",
-            default: "John Doe",
-            description: "This is the name of the thing",
-          },
-        },
-      };
-
-      // Populate the data with default values from the schema:
-      const data = OgrafForm.getDefaultDataFromSchema(exampleSchema);
-
-      // Initialize the Form:
-      const form = new OgrafForm.SuperFlyTvOgrafDataForm();
       form.addEventListener("onChange", (e) => {
-        console.log("Caught onChange event", JSON.stringify(e.detail));
+        console.log("Caught onChange event", e.detail.data);
         // The onChange event is fired when a user changes a value in the form
         // It does NOT fire on each key stroke.
         // This is a good time to update our data object:
         dataDiv.innerHTML = JSON.stringify(e.detail.data, null, 2);
       });
       form.addEventListener("onKeyUp", (e) => {
-        console.log("Caught onKey event", JSON.stringify(e.detail));
-        // The onKeyUp event is fired on each key stroke in the form.
-        // e.detail.data contains the current data.
+        console.log("Caught onKeyUp event", e.detail.data);
       });
-      form.schema = exampleSchema;
-      form.data = data;
-
-      dataDiv.innerHTML = JSON.stringify(data, null, 2);
-
-      container.appendChild(form);
     </script>
   </body>
 </html>

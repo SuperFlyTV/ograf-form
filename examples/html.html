@@ -1,6 +1,12 @@
 <!DOCTYPE html>
 <html>
   <body>
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/ograf-form/dist/main.js"
+    ></script>
+    <!-- <script type="module" src="/dist/main.js"></script> -->
+
     <div id="form-container" style="width: 100vw">
       <superflytv-ograf-form
         id="ograf-form"
@@ -8,27 +14,21 @@
       ></superflytv-ograf-form>
     </div>
     <div id="data" style="white-space: pre"></div>
-    <!-- <script type="module" src="/dist/main.js"></script> -->
-    <script
-      type="module"
-      src="https://cdn.jsdelivr.net/npm/ograf-form/dist/my-lib.js"
-    ></script>
 
     <script type="text/javascript">
       // Listen to changes:
-      document
-        .getElementById("ograf-form")
-        .addEventListener("onChange", (e) => {
-          console.log("Caught onChange event", JSON.stringify(e.detail));
-          // The onChange event is fired when a user changes a value in the form
-          // It does NOT fire on each key stroke.
-          // This is a good time to update our data object:
-          document.getElementById("data").innerHTML = JSON.stringify(
-            e.detail.data,
-            null,
-            2
-          );
-        });
+      const form = document.getElementById("ograf-form");
+      const dataDiv = document.getElementById("data");
+      form.addEventListener("onChange", (e) => {
+        console.log("Caught onChange event", e.detail.data);
+        // The onChange event is fired when a user changes a value in the form
+        // It does NOT fire on each key stroke.
+        // This is a good time to update our data object:
+        dataDiv.innerHTML = JSON.stringify(e.detail.data, null, 2);
+      });
+      form.addEventListener("onKeyUp", (e) => {
+        console.log("Caught onKeyUp event", e.detail.data);
+      });
     </script>
   </body>
 </html>
