@@ -14,8 +14,8 @@ Or you can use a CDN: `https://cdn.jsdelivr.net/npm/ograf-form/dist/main.js);`
 
 ### Example usage
 
-- How to use directly in html: [Code](/blob/main/examples/html.html), [Live Example](https://html-preview.github.io/?url=https://github.com/SuperFlyTV/ograf-form/blob/main/examples/html.html).
-- How to use with javascript: [Code](/blob/main/examples/javascript.html), [Live Example](https://html-preview.github.io/?url=https://github.com/SuperFlyTV/ograf-form/blob/main/examples/javascript.html).
+- How to use directly in html: [Code](/examples/html.html), [JSFiddle](https://jsfiddle.net/L2trysaz/).
+- How to use with javascript: [Code](/examples/javascript.html), [JSFiddle]().
 - How to use with React: [Code](/blob/main/examples/react.jsx).
 
 ### Example implementation
