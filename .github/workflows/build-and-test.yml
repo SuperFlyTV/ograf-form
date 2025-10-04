@@ -18,21 +18,15 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
-      - name: Use Node.js 24
-        uses: actions/setup-node@v5
+      - uses: actions/setup-node@v5
         with:
           node-version: 24
           package-manager-cache: false
       - name: Prepare Environment
-        run: |
-          corepack enable
-          yarn install --frozen-lockfile
+        run: yarn install --frozen-lockfile
         env:
           CI: true
       - name: Build
-        run: |
-          yarn build
+        run: yarn build
         env:
           CI: true
