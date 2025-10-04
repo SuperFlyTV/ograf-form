@@ -11,7 +11,7 @@ on:
   pull_request:
 
 jobs:
-  prerelease:
+  build:
     name: Build
     runs-on: ubuntu-latest
     timeout-minutes: 15
@@ -21,9 +21,11 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: 24
-          cache: "yarn"
+          package-manager-cache: false
       - name: Prepare Environment
-        run: yarn install --frozen-lockfile
+        run: |
+          corepack enable
+          yarn install --frozen-lockfile
         env:
           CI: true
       - name: Build
