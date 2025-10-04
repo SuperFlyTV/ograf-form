@@ -21,7 +21,7 @@ jobs:
       - uses: actions/setup-node@v5
         with:
           node-version: 24
-          package-manager-cache: false
+          cache: "yarn"
       - name: Prepare Environment
         run: yarn install --frozen-lockfile
         env:
