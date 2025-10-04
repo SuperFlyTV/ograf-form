@@ -1,5 +1,7 @@
 # OGraf-form
 
+[![NPM Version](https://img.shields.io/npm/v/ograf-form)](https://www.npmjs.com/package/ograf-form)
+
 This is a Web Component for generating input forms from [OGraf/GDD](https://ograf.ebu.io/) schemas.
 
 ## Getting Started
