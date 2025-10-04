@@ -16,7 +16,7 @@ Or you can use a CDN: `https://cdn.jsdelivr.net/npm/ograf-form/dist/main.js);`
 
 - How to use directly in html: [Code](/examples/html.html), [JSFiddle](https://jsfiddle.net/L2trysaz/).
 - How to use with javascript: [Code](/examples/javascript.html), [JSFiddle](https://jsfiddle.net/2Lhgco5b/).
-- How to use with React: [Code](/blob/main/examples/react.jsx).
+- How to use with React: [Code](/examples/react.jsx).
 
 ### Example implementation
 
