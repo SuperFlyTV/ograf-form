@@ -42,6 +42,6 @@ jobs:
         #   echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
         #   NEW_VERSION=$(node -p "require('./package.json').version")
         #   yarn publish --access=public --new-version=$NEW_VERSION --network-timeout 100000
-        run: npm publish --network-timeout 100000
+        run: npm publish
         env:
           CI: true
