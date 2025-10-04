@@ -24,8 +24,6 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: 24
-          cache: "yarn"
-          cache-dependency-path: "yarn.lock"
           package-manager-cache: false
       - name: Prepare Environment
         run: |
