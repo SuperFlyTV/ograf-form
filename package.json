@@ -10,6 +10,10 @@
     "email": "johan@superfly.tv"
   },
   "homepage": "https://github.com/SuperFlyTV/ograf-form",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/SuperFlyTV/ograf-form"
+  },
   "scripts": {
     "release": "commit-and-tag-version",
     "dev": "vite",
