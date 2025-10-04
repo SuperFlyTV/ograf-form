@@ -4,34 +4,44 @@ on:
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
+permissions:
+  id-token: write # Required for OIDC
+  contents: read
+
 jobs:
-  prerelease:
+  Publish:
     name: Publish to NPM
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
     steps:
       - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
         with:
-          fetch-depth: 0
-      - name: Use Node.js 22
-        uses: actions/setup-node@v5
-        with:
-          node-version: 22
+          node-version: 24
+          package-manager-cache: false
+          registry-url: "https://registry.npmjs.org"
+
+      # Ensure npm 11.5.1 or later is installed:
+      # - name: Update npm
+      #   run: npm install -g npm@latest
+
       - name: Prepare Environment
         run: |
-          yarn install
+          corepack enable
+          yarn install --frozen-lockfile
         env:
           CI: true
+
       - name: Build
-        run: |
-          yarn build
+        run: yarn build
         env:
           CI: true
       - name: Publish to NPM
-        run: |
-          echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
-          NEW_VERSION=$(node -p "require('./package.json').version")
-          yarn publish --access=public --new-version=$NEW_VERSION --network-timeout 100000
+        # run: |
+        #   echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_TOKEN }}" >> ~/.npmrc
+        #   NEW_VERSION=$(node -p "require('./package.json').version")
+        #   yarn publish --access=public --new-version=$NEW_VERSION
+        run: npm publish
         env:
           CI: true
