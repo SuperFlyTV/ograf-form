@@ -20,7 +20,8 @@ jobs:
           node-version: 22
       - name: Prepare Environment
         run: |
-          yarn install
+          corepack enable
+          yarn
         env:
           CI: true
       - name: Build
