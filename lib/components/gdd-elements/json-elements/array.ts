@@ -352,6 +352,10 @@ export class GDDTable extends GDDElementBase {
         }
       } else {
         // Array of not-objects
+        console.error(
+          "Internal error: GDDTable used for non-object array",
+          this.schema
+        );
       }
 
       contentRow.removeButton.textContent =
