@@ -20,6 +20,10 @@ export class GDDPercentage extends GDDInputNumberBase {
       this.elInput.type = "text";
       const orgOnKeyDown = this.elInput.onkeydown;
       this.elInput.onkeydown = (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          // Prevent form submission
+        }
         if (!this.elInput) return;
 
         if (e.key === "ArrowUp" || e.key === "ArrowDown") {
@@ -75,7 +79,7 @@ export class GDDPercentage extends GDDInputNumberBase {
         e.preventDefault();
 
         if (this._isChanged) {
-          // because onChange is not emitted if we've only modified using arrow keys:
+          // because change is not emitted if we've only modified using arrow keys:
           this.elInput?.onchange?.(e);
         }
         this._isChanged = false;

@@ -1,32 +1,12 @@
-import type { GDDSchema } from "../../../lib/types.js";
+import type { GDDSchema, GDDTypeName } from "../../../lib/types.js";
 import { validateDataSimple } from "../../../lib/validate-data.js";
-
-export interface Options {
-  schema: GDDSchema;
-  data: any;
-  renderOptions?: Partial<RenderOptions>;
-}
-
-export const DEFAULT_DICTIONARY = {
-  addRow: "Add Row",
-  removeRow: "Remove",
-  addItem: "Add",
-  removeItem: " - ",
-  addItemDescription: "Add item",
-  removeItemDescription: "Remove item",
-};
-export type Dictionary = typeof DEFAULT_DICTIONARY;
-export interface RenderOptions {
-  formStyle: string | "" | "default";
-  dictionary: Dictionary;
-}
 
 export function renderContentError(
   elError: HTMLDivElement,
   schema: GDDSchema,
-  data: any
+  value: any
 ): void {
-  const errors = validateDataSimple(schema, data, "");
+  const errors = validateDataSimple(schema, value, "");
 
   if (errors.errors.length === 0) {
     elError.style.display = "none";
@@ -74,4 +54,8 @@ export function getLeastSignificantPower(num: number): number {
     factor *= 10;
   }
   return 1 / factor;
+}
+
+export function getBasicType(schemaType: GDDSchema["type"]): GDDTypeName {
+  return Array.isArray(schemaType) ? schemaType[0] : schemaType;
 }

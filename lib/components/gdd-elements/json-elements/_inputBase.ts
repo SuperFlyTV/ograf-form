@@ -10,11 +10,28 @@ export abstract class GDDInputBase extends GDDElementBase {
       this.elInput = document.createElement("input");
       this.appendChild(this.elInput);
 
+      this.elInput.name = this.path;
+      this.elInput.onchange = (e) => {
+        if (!e.target) return;
+        if (!(e.target instanceof HTMLInputElement)) return;
+        e.stopPropagation();
+        this.emitChangeEvent(e.target.value);
+      };
       this.elInput.onkeydown = (e) => {
         if (e.key === "Enter") {
           e.preventDefault();
           // Prevent form submission
         }
+        if (!e.target) return;
+        if (!(e.target instanceof HTMLInputElement)) return;
+        e.stopPropagation();
+        this.emitKeyDownEvent(e, e.target.value, e.target.value);
+      };
+      this.elInput.onkeyup = (e) => {
+        if (!e.target) return;
+        if (!(e.target instanceof HTMLInputElement)) return;
+        e.stopPropagation();
+        this.emitKeyUpEvent(e, e.target.value, e.target.value);
       };
     }
 
@@ -25,5 +42,13 @@ export abstract class GDDInputBase extends GDDElementBase {
       // No style
     }
     return initialRender;
+  }
+  destroy(): void {
+    super.destroy();
+    if (this.elInput) {
+      this.elInput.onchange = null;
+      this.elInput.onkeydown = null;
+      this.elInput.onkeyup = null;
+    }
   }
 }

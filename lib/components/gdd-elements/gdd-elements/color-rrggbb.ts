@@ -12,11 +12,11 @@ export class GDDColorRRGGBB extends GDDInputBase {
 
       this.elInput.onchange = (e) => {
         if (!e.target) return;
-        this.emitOnChange((e.target as any).value);
+        this.emitChangeEvent((e.target as any).value);
       };
     }
 
-    this.elInput.value = this.data || "";
+    this.elInput.value = this.value || "";
     this._renderStyle();
     return initialRender;
   }

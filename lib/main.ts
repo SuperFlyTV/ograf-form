@@ -1,8 +1,12 @@
 import { SuperFlyTvOgrafDataForm } from "./components/ograf-form.js";
+
 import { getDefaultDataFromSchema } from "./lib/default-data.js";
 import { validateDataSimple } from "./lib/validate-data.js";
 import { validateGDDSchema } from "./lib/validate-schema.js";
 export type { GDDSchema } from "./lib/types.js";
+
+export type { GetGDDElementFunctionOptional } from "./components/ograf-form.js";
+export * from "./components/gdd-elements/index.js";
 
 export {
   SuperFlyTvOgrafDataForm,

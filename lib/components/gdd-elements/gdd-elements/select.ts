@@ -28,7 +28,7 @@ export class GDDSelect extends GDDElementBase {
 
         const option = this._options[(e.target as any).value];
         if (option) {
-          this.emitOnChange(option.value);
+          this.emitChangeEvent(option.value);
         }
       };
     }
@@ -69,7 +69,7 @@ export class GDDSelect extends GDDElementBase {
       if (!(elOption instanceof HTMLOptionElement)) continue;
       const option = this._options[elOption.getAttribute("value") || ""];
       if (!option) continue;
-      elOption.selected = isEqual(this.data, option.value);
+      elOption.selected = isEqual(this.value, option.value);
     }
 
     this._renderStyle();

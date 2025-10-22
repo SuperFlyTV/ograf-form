@@ -19,17 +19,17 @@ export function OGrafForm({ schema, onDataChangeCallback }) {
   // Set up listener for when the data has changed in the form:
   React.useLayoutEffect(() => {
     if (formRef.current) {
-      const listener = (e) => onDataChange(e.detail.data);
-      formRef.current.addEventListener("onChange", listener);
-      return () => formRef.current.removeEventListener("onChange", listener);
+      const listener = (e) => onDataChange(e.target.value);
+      formRef.current.addEventListener("change", listener);
+      return () => formRef.current.removeEventListener("change", listener);
     }
   });
   // (Optional) Set up listener for whenever user is editing (ie every key)
   // React.useLayoutEffect(() => {
   //   if (formRef.current) {
-  //     const listener = (e) => onDataChange(e.detail.data);
-  //     formRef.current.addEventListener("onKeyUp", listener);
-  //     return () => formRef.current.removeEventListener("onKeyUp", listener);
+  //     const listener = (e) => onDataChange(e.target.value);
+  //     formRef.current.addEventListener("keyup", listener);
+  //     return () => formRef.current.removeEventListener("keyup", listener);
   //   }
   // });
 
@@ -38,7 +38,7 @@ export function OGrafForm({ schema, onDataChangeCallback }) {
       <superflytv-ograf-form
         ref={formRef}
         schema={JSON.stringify(schema)}
-        data={JSON.stringify(data)}
+        value={JSON.stringify(data)}
       ></superflytv-ograf-form>
     </div>
   );

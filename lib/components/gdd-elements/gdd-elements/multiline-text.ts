@@ -12,23 +12,26 @@ export class GDDMultiLineText extends GDDElementBase {
 
       this.elInput.onchange = (e) => {
         if (!e.target) return;
-        this.emitOnChange((e.target as any).value);
+        if (!(e.target instanceof HTMLTextAreaElement)) return;
+        this.emitChangeEvent(e.target.value);
         this._renderStyle();
       };
       this.elInput.onkeydown = (e) => {
         if (!e.target) return;
-        this.emitOnKeyDown(e, (e.target as any).value, (e.target as any).value);
+        if (!(e.target instanceof HTMLTextAreaElement)) return;
+        this.emitKeyDownEvent(e, e.target.value, e.target.value);
       };
       this.elInput.onkeyup = (e) => {
         if (!e.target) return;
-        this.emitOnKeyUp(e, (e.target as any).value, (e.target as any).value);
+        if (!(e.target instanceof HTMLTextAreaElement)) return;
+        this.emitKeyUpEvent(e, e.target.value, e.target.value);
         this._renderStyle();
       };
     }
 
     this.elInput.name = this.path;
 
-    this.elInput.value = this.data || "";
+    this.elInput.value = this.value || "";
 
     this._renderStyle();
     return initialRender;

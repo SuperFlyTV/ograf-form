@@ -1,13 +1,18 @@
 import "./style.css";
 import * as examples from "./exampleSchemas.js";
-import {
-  SuperFlyTvOgrafDataForm,
-  getDefaultDataFromSchema,
-} from "../lib/main.js";
+import { SuperFlyTvOgrafDataForm } from "../lib/main.js";
 /*
   Note: This sets things up for Development!
   The actual components are in lib/*
 */
+
+// class TMP_GDD extends GDDElementBase {
+//   render(): boolean {
+//     this.innerHTML = "TMPGDD";
+//     return false;
+//   }
+// }
+// window.customElements.define("tmp-gdd", TMP_GDD);
 
 const app = document.querySelector<HTMLDivElement>("#app") as HTMLDivElement;
 
@@ -20,25 +25,54 @@ function renderSchema(schema: any) {
   app.appendChild(dataDiv);
   dataDiv.style.whiteSpace = "pre";
 
-  const data = getDefaultDataFromSchema(schema);
-
   const form = new SuperFlyTvOgrafDataForm();
-  form.addEventListener("onChange", (e) => {
+  form.addEventListener("change", (e) => {
+    if (!e.target) return;
     if (!(e instanceof CustomEvent)) return;
-    console.log("Caught onChange event", JSON.stringify(e.detail));
+    if (!(e.target instanceof SuperFlyTvOgrafDataForm)) {
+      throw new Error("Unexpected target");
+    }
+    console.log("JS: Caught change event", e.target.value);
 
-    dataDiv.innerHTML = JSON.stringify(e.detail.data, null, 2);
+    dataDiv.innerHTML = JSON.stringify(e.target.value, null, 2);
   });
-  form.addEventListener("onKeyUp", (e) => {
+  form.addEventListener("keyup", (e) => {
     if (!(e instanceof CustomEvent)) return;
-    console.log("Caught onKey event", JSON.stringify(e.detail));
 
-    dataDiv.innerHTML = JSON.stringify(e.detail.data, null, 2);
+    if (!(e.target instanceof SuperFlyTvOgrafDataForm)) {
+      throw new Error("Unexpected target");
+    }
+    console.log("JS: Caught keyup event", e.target.value);
+
+    dataDiv.innerHTML = JSON.stringify(e.target.value, null, 2);
   });
   form.schema = schema as any;
-  form.data = data;
+  // form.value = value;
 
-  dataDiv.innerHTML = JSON.stringify(data, null, 2);
+  // Example of custom getGDDElement function:
+  // form.getGDDElement = (props) => {
+  //   const baseType = getBasicType(props.schema.type);
+  //   if (baseType === "string") {
+  //     return new TMP_GDD({
+  //       path: props.path,
+  //       getGDDElement: props.getGDDElement,
+  //     });
+  //   }
+  // };
+  // Set dictionary
+  // form.dictionary = {
+  //   addItem: "Ajouter",
+  //   removeItem: "Supprimer",
+  //   addRow: "Ajouter",
+  //   removeRow: "Supprimer",
+  // };
+
+  // form.postRender = () => {
+  //   form
+  //     .querySelectorAll('input[type="text"]')
+  //     .forEach((el: HTMLInputElement) => (el.style.backgroundColor = "#933"));
+  // };
+  // dataDiv.innerHTML = JSON.stringify(value, null, 2);
 
   container.appendChild(form);
 }
@@ -51,41 +85,22 @@ function renderHTML(schema: any) {
   app.appendChild(dataDiv);
   dataDiv.style.whiteSpace = "pre";
 
-  // const data = getDefaultDataFromSchema(schema);
-
-  // const form = new SuperFlyTvOgrafDataForm();
-  // form.addEventListener("onChange", (e) => {
-  //   if (!(e instanceof CustomEvent)) return;
-  //   console.log("Caught onChange event", JSON.stringify(e.detail));
-
-  //   dataDiv.innerHTML = JSON.stringify(e.detail.data, null, 2);
-  // });
-  // form.addEventListener("onKeyUp", (e) => {
-  //   if (!(e instanceof CustomEvent)) return;
-  //   console.log("Caught onKey event", JSON.stringify(e.detail));
-
-  //   dataDiv.innerHTML = JSON.stringify(e.detail.data, null, 2);
-  // });
-  // form.schema = schema as any;
-  // form.data = data;
-
-  // dataDiv.innerHTML = JSON.stringify(data, null, 2);
-
   // container.appendChild(form);
   container.innerHTML = `
     <superflytv-ograf-form
         schema='${JSON.stringify(schema)}'
-        data=''
+
+        onchange="console.log('HTML: Caught change event', this.value)"
+        onkeyup="console.log('HTML: Caught keyup event', this.value)"
     ></superflytv-ograf-form>
 
   `;
 }
 
-// renderSchema(manifest.schema);
 // renderSchema(examples.table);
-// renderSchema(examples.nakedTable);
+renderSchema(examples.nakedTable);
 // renderSchema(examples.deepObject);
 // renderSchema(examples.objectInArray);
 // renderSchema(examples.constraints);
-renderSchema(examples.oneOfEach);
-renderHTML(examples.oneOfEach);
+// renderSchema(examples.oneOfEach);
+renderHTML(examples.table);

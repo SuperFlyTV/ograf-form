@@ -24,24 +24,30 @@ export class GDDColorRRGGBBAA extends GDDColorRRGGBB {
         this.elContentAlpha.onchange = (e) => {
           if (!e.target) return;
           if (!(e.target instanceof HTMLInputElement)) return;
+          e.stopPropagation();
 
           const int = this._parseInput(e.target.value);
           if (int === null) {
             // invalid input, revert
             e.target.value = `${this._alpha}` || "";
           } else {
-            if (this.data !== int) {
+            if (this.value !== int) {
               this._alpha = int;
 
-              this.emitOnChange(this.getRRGGBBAA(this._rrggbb, this._alpha));
+              this.emitChangeEvent(this.getRRGGBBAA(this._rrggbb, this._alpha));
             }
             e.target.value = `${int}`;
           }
         };
 
         this.elContentAlpha.onkeydown = (e) => {
+          if (e.key === "Enter") {
+            e.preventDefault();
+            // Prevent form submission
+          }
           if (!e.target) return;
-          this.emitOnKeyDown(
+
+          this.emitKeyDownEvent(
             e,
             (e.target as any).value,
             (e.target as any).value
@@ -50,11 +56,12 @@ export class GDDColorRRGGBBAA extends GDDColorRRGGBB {
         this.elContentAlpha.onkeyup = (e) => {
           if (!e.target) return;
           if (!(e.target instanceof HTMLInputElement)) return;
+          e.stopPropagation();
 
           const int = this._parseInput(e.target.value);
 
           if (int === null) return;
-          this.emitOnKeyUp(
+          this.emitKeyUpEvent(
             e,
             e.target.value,
             this.getRRGGBBAA(this._rrggbb, int)
@@ -66,13 +73,13 @@ export class GDDColorRRGGBBAA extends GDDColorRRGGBB {
 
         this._rrggbb = (e.target as any).value.replace("#", "");
 
-        this.emitOnChange(this.getRRGGBBAA(this._rrggbb, this._alpha));
+        this.emitChangeEvent(this.getRRGGBBAA(this._rrggbb, this._alpha));
       };
     }
 
     if (!this.elContentAlpha) return initialRender;
 
-    const rrggbbaa = this.data || "#00000000";
+    const rrggbbaa = this.value || "#00000000";
     this._rrggbb = rrggbbaa.slice(1, 7);
     this._alpha = parseInt(rrggbbaa.slice(7, 9), 16) / 255;
 

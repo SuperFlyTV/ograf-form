@@ -58,6 +58,15 @@ export function lookupKeys(
 
   return { existing, missing };
 }
+export function nthInIterable<T>(
+  items: Iterable<T> | ArrayLike<T> | T[] | undefined,
+  index: number
+): T | undefined {
+  if (!items) return undefined;
+  const array = Array.from(items);
+
+  return array[index];
+}
 export function last<T>(
   items: Iterable<T> | ArrayLike<T> | T[] | undefined
 ): T | undefined {

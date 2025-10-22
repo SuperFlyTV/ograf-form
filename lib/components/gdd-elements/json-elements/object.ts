@@ -1,16 +1,11 @@
-import { GDDElementBase, isCustomEvent } from "../lib/_base.js";
-import { getBasicType, getGDDElement } from "../index.js";
-import { renderContentError } from "../lib/lib.js";
+import { GDDElementBase, isCustomEventKey } from "../lib/_base.js";
+import { getBasicType, renderContentError } from "../lib/lib.js";
 
 export class GDDObject extends GDDElementBase {
   private content: Record<string, GDDElementBase> = {};
 
-  constructor() {
-    super();
-  }
-
   render(): boolean {
-    if (!this.data) this.data = {};
+    if (!this.value) this.value = {};
 
     const properties = Object.entries(this.schema?.properties ?? {}).sort(
       (a, b) => {
@@ -27,39 +22,44 @@ export class GDDObject extends GDDElementBase {
     for (const [key, schema] of properties) {
       existingKeys.add(key);
       if (!this.content[key]) {
-        const el = new GDDObjectProperty();
-        el.path = `${this.path}.${key}`;
+        const el = new GDDObjectProperty({
+          path: `${this.path}.${key}`,
+          getGDDElement: this.getGDDElement,
+        });
         this.content[key] = el;
         this.appendChild(el);
 
-        el.addEventListener("onChange", (e: Event) => {
+        el.addListener("change", (e: Event) => {
           if (!(e instanceof CustomEvent)) return;
           e.stopPropagation();
 
-          this.data[key] = e.detail.data;
+          this.value[key] = e.detail.value;
 
-          this.emitOnChange(this.data);
+          this.emitChangeEvent(this.value);
         });
-        el.addEventListener("onKeyUp", (e: Event) => {
+        el.addListener("keyup", (e: Event) => {
           if (!(e instanceof CustomEvent)) return;
           e.stopPropagation();
-          this.data[key] = e.detail.data;
-          this.emitOnKeyUp(e, "<object>", this.data);
+          this.value[key] = e.detail.value;
+          this.emitKeyUpEvent(e, "<object>", this.value);
         });
       }
 
       schema.title = schema.title || key;
-      const data = this.data[key];
+      const value = this.value[key];
 
       this.content[key].update({
         schema,
-        data,
+        value,
         renderOptions: this.renderOptions,
       });
     }
+
+    // Remove items
     for (const [key, el] of Object.entries(this.content)) {
       if (existingKeys.has(key)) continue; // still exists
       // else remove:
+      el.destroy();
       this.removeChild(el);
       delete this.content[key];
     }
@@ -76,6 +76,13 @@ export class GDDObject extends GDDElementBase {
     } else {
       // No style
     }
+  }
+  destroy(): void {
+    super.destroy();
+    for (const el of Object.values(this.content)) {
+      el.destroy();
+    }
+    this.content = {};
   }
 }
 export class GDDObjectProperty extends GDDElementBase {
@@ -101,26 +108,30 @@ export class GDDObjectProperty extends GDDElementBase {
         // labelContainer: document.createElement("div"),
         label: document.createElement("label"),
         description: document.createElement("span"),
-        content: getGDDElement(this.schema, this.path),
+        content: this.getGDDElement({
+          schema: this.schema,
+          path: this.path,
+          getGDDElement: this.getGDDElement,
+        }),
         contentError: document.createElement("div"),
       };
 
       // Listen to events to update validation error:
-      this.content.content.addEventListener("onChange", (e: any) => {
-        if (isCustomEvent(e) && this.content && this.schema) {
+      this.content.content.addListener("change", (e: any) => {
+        if (isCustomEventKey(e) && this.content && this.schema) {
           renderContentError(
             this.content.contentError,
             this.schema,
-            e.detail.data
+            e.detail.value
           );
         }
       });
-      this.content.content.addEventListener("onKeyUp", (e: any) => {
-        if (isCustomEvent(e) && this.content && this.schema) {
+      this.content.content.addListener("keyup", (e: any) => {
+        if (isCustomEventKey(e) && this.content && this.schema) {
           renderContentError(
             this.content.contentError,
             this.schema,
-            e.detail.data
+            e.detail.value
           );
         }
       });
@@ -140,7 +151,7 @@ export class GDDObjectProperty extends GDDElementBase {
     }
     this.content.content.update({
       schema: this.schema,
-      data: this.data,
+      value: this.value,
       renderOptions: this.renderOptions,
     });
 
@@ -148,10 +159,16 @@ export class GDDObjectProperty extends GDDElementBase {
     this.content.label.title = this.schema.description || "";
     this.content.description.textContent = this.schema.description || "";
 
-    renderContentError(this.content.contentError, this.schema, this.data);
+    renderContentError(this.content.contentError, this.schema, this.value);
 
     this._renderStyle();
     return initialRender;
+  }
+  destroy(): void {
+    super.destroy();
+    if (this.content) {
+      this.content.content.destroy();
+    }
   }
   private _renderStyle() {
     if (!this.content) return;
