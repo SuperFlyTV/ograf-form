@@ -1,6 +1,6 @@
 {
   "name": "ograf-form",
-  "version": "0.0.3",
+  "version": "0.1.0",
   "type": "module",
   "main": "./dist/main.js",
   "description": "A web component for generating forms from OGraf/GDD schemas.",
