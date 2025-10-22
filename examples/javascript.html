@@ -9,7 +9,8 @@
       const dataDiv = document.getElementById("data");
 
       // Load the library, either from CDN or locally:
-      const OgrafForm = await import("https://cdn.jsdelivr.net/npm/ograf-form/dist/main.js");
+      // const OgrafForm = await import("https://cdn.jsdelivr.net/npm/ograf-form");
+      const OgrafForm = await import("/dist/main.js");
       // const OgrafForm = await import("ograf-form");
 
       // Define a OGraf/GDD JSON-schema:
@@ -30,20 +31,20 @@
 
       // Initialize the Form:
       const form = new OgrafForm.SuperFlyTvOgrafDataForm();
-      form.addEventListener("onChange", (e) => {
-        console.log("Caught onChange event", JSON.stringify(e.detail));
-        // The onChange event is fired when a user changes a value in the form
+      form.addEventListener("change", (e) => {
+        console.log("Caught change event", e.target.value, e.detail);
+        // The change event is fired when a user changes a value in the form
         // It does NOT fire on each key stroke.
         // This is a good time to update our data object:
-        dataDiv.innerHTML = JSON.stringify(e.detail.data, null, 2);
+        dataDiv.innerHTML = JSON.stringify(e.target.value, null, 2);
       });
-      form.addEventListener("onKeyUp", (e) => {
-        console.log("Caught onKey event", JSON.stringify(e.detail));
-        // The onKeyUp event is fired on each key stroke in the form.
-        // e.detail.data contains the current data.
+      form.addEventListener("keyup", (e) => {
+        console.log("Caught keyup event", e.target.value, e.detail);
+        // The keyup event is fired on each key stroke in the form.
+        // e.target.value contains the current data.
       });
       form.schema = exampleSchema;
-      form.data = data;
+      form.value = data;
 
       dataDiv.innerHTML = JSON.stringify(data, null, 2);
 

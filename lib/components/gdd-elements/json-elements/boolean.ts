@@ -12,18 +12,19 @@ export class GDDBoolean extends GDDInputBase {
       this.elInput.onchange = (e) => {
         if (!e.target) return;
         if (!(e.target instanceof HTMLInputElement)) return;
+        e.stopPropagation();
 
         const checked = Boolean(e.target.checked);
 
-        if (this.data !== checked) {
-          this.data = checked;
-          this.emitOnKeyUp(e, "", checked);
-          this.emitOnChange(this.data);
+        if (this.value !== checked) {
+          this.value = checked;
+          this.emitKeyUpEvent(e, "", checked);
+          this.emitChangeEvent(this.value);
         }
-        e.target.checked = Boolean(this.data);
+        e.target.checked = Boolean(this.value);
       };
     }
-    this.elInput.checked = Boolean(this.data);
+    this.elInput.checked = Boolean(this.value);
 
     this._renderStyle();
     return initialRender;

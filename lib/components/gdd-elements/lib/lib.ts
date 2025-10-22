@@ -3,7 +3,7 @@ import { validateDataSimple } from "../../../lib/validate-data.js";
 
 export interface Options {
   schema: GDDSchema;
-  data: any;
+  value: any;
   renderOptions?: Partial<RenderOptions>;
 }
 
@@ -24,9 +24,9 @@ export interface RenderOptions {
 export function renderContentError(
   elError: HTMLDivElement,
   schema: GDDSchema,
-  data: any
+  value: any
 ): void {
-  const errors = validateDataSimple(schema, data, "");
+  const errors = validateDataSimple(schema, value, "");
 
   if (errors.errors.length === 0) {
     elError.style.display = "none";

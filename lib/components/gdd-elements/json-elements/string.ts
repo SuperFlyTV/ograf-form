@@ -11,18 +11,12 @@ export class GDDString extends GDDInputBase {
 
     this.elInput.onchange = (e) => {
       if (!e.target) return;
-      this.emitOnChange((e.target as any).value);
-    };
-    this.elInput.onkeydown = (e) => {
-      if (!e.target) return;
-      this.emitOnKeyDown(e, (e.target as any).value, (e.target as any).value);
-    };
-    this.elInput.onkeyup = (e) => {
-      if (!e.target) return;
-      this.emitOnKeyUp(e, (e.target as any).value, (e.target as any).value);
+      if (!(e.target instanceof HTMLInputElement)) return;
+      e.stopPropagation();
+      this.emitChangeEvent(e.target.value);
     };
 
-    this.elInput.value = this.data || "";
+    this.elInput.value = this.value || "";
     this._renderStyle();
     return initialRender;
   }

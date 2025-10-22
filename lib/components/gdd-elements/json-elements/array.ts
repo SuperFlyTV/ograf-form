@@ -1,6 +1,6 @@
 import { getDefaultDataFromSchema } from "../../../lib/default-data.js";
-import { last } from "../../../lib/lib.js";
-import { GDDElementBase, isCustomEvent } from "../lib/_base.js";
+import { nthInIterable } from "../../../lib/lib.js";
+import { GDDElementBase, isCustomEventKey } from "../lib/_base.js";
 import { getGDDElement } from "../index.js";
 import { renderContentError } from "../lib/lib.js";
 
@@ -21,7 +21,7 @@ export class GDDArray extends GDDElementBase {
       this.appendChild(this.elContent);
     }
     this.elContent.update({
-      data: this.data,
+      value: this.value,
       schema: this.schema,
       renderOptions: this.renderOptions,
     });
@@ -34,24 +34,28 @@ export class GDDSimpleArray extends GDDElementBase {
     itemsContainer: HTMLDivElement;
     items: {
       container: HTMLDivElement;
-      element: GDDElementBase;
+      element: GDDArrayProperty;
       removeButton: HTMLButtonElement;
+      index: number;
     }[];
   } | null = null;
 
-  private addItem() {
+  private addItem(index = -1): number | undefined {
     if (!this.schema?.items) return;
     const schemaItems = this.schema.items;
     const defaultData = getDefaultDataFromSchema(schemaItems);
 
-    this.data.push(defaultData);
+    if (index < 0) index = this.value.length - index;
+
+    this.value.splice(index, 0, defaultData);
     this.render();
-    this.emitOnChange(this.data);
+    this.emitChangeEvent(this.value);
+    return index;
   }
   private removeItem(e: Event, index: number) {
-    this.data.splice(index, 1);
-    this.emitOnKeyUp(e, "<array>", this.data);
-    this.emitOnChange(this.data);
+    this.value.splice(index, 1);
+    this.emitKeyUpEvent(e, "<array>", this.value);
+    this.emitChangeEvent(this.value);
     this.render();
   }
 
@@ -61,7 +65,7 @@ export class GDDSimpleArray extends GDDElementBase {
     if (!this.schema.items) return false;
     const schemaItems = this.schema.items;
 
-    if (!this.data) this.data = [];
+    if (!this.value) this.value = [];
 
     if (!this.content) {
       initialRender = true;
@@ -80,91 +84,104 @@ export class GDDSimpleArray extends GDDElementBase {
       this.appendChild(this.content.addButton);
     }
 
-    for (const item of this.content.items.splice(this.data.length)) {
+    // Remove extra items
+    for (const item of this.content.items.splice(this.value.length)) {
+      item.element.destroy();
       this.content.itemsContainer.removeChild(item.container);
     }
 
-    for (let i = 0; i < this.data.length; i++) {
+    for (let i = 0; i < this.value.length; i++) {
       if (!this.content.items[i]) {
         const container = document.createElement("div");
         container.className = "gdd-simple-array-item";
         const removeButton = document.createElement("button");
-        removeButton.tabIndex = -1;
-
-        removeButton.onclick = (e: Event) => {
-          e.preventDefault();
-          this.removeItem(e, i);
-        };
-
         const element = new GDDArrayProperty();
-        element.path = `${this.path}[${i}]`;
 
-        element.addEventListener("onChange", (e: Event) => {
+        const contentItem = {
+          container,
+          removeButton,
+          element,
+          index: i,
+        };
+        this.content.items.push(contentItem);
+
+        contentItem.element.addListener("change", (e: Event) => {
           if (!(e instanceof CustomEvent)) return;
           e.stopPropagation();
-          this.data[i] = e.detail.data;
 
-          this.emitOnChange(this.data);
+          this.value[contentItem.index] = e.detail.value;
+
+          this.emitChangeEvent(this.value);
         });
-        element.addEventListener("onKeyUp", (e: Event) => {
-          if (!isCustomEvent(e)) return;
+        contentItem.element.addListener("keydown", (e: Event) => {
+          if (!isCustomEventKey(e)) return;
+          keyDownValueStr = e.detail.valueStr;
+        });
+        contentItem.element.addListener("keyup", (e: Event) => {
+          if (!isCustomEventKey(e)) return;
 
           if (e.detail.key === "Enter") {
             // Add another item
-            this.addItem();
-            last(
+            e.stopPropagation();
+
+            const newIndex = this.addItem(contentItem.index + 1);
+
+            if (newIndex !== undefined) {
+              nthInIterable(
+                this.content?.itemsContainer.querySelectorAll<HTMLInputElement>(
+                  "input, textarea"
+                ),
+                newIndex
+              )?.focus();
+            }
+          } else if (
+            e.detail.key === "Backspace" &&
+            e.detail.valueStr === "" &&
+            keyDownValueStr === ""
+          ) {
+            e.preventDefault();
+            e.stopPropagation();
+            // Remove the item
+
+            this.removeItem(e, contentItem.index);
+
+            nthInIterable(
               this.content?.itemsContainer.querySelectorAll<HTMLInputElement>(
                 "input, textarea"
-              )
+              ),
+              Math.max(0, contentItem.index - 1)
             )?.focus();
-            // } else if (e.detail.key === "Backspace" && e.detail.inputStr === "") {
-            //   // Remove the item
-            //   this.removeItem(e, i);
-
-            //   last(
-            //     this.content?.itemsContainer.querySelectorAll<HTMLInputElement>(
-            //       "input, textarea"
-            //     )
-            //   )?.focus();
           } else {
             e.stopPropagation();
-            this.data[i] = e.detail.data;
-            this.emitOnKeyUp(e, "<array>", this.data);
+            this.value[contentItem.index] = e.detail.value;
+            this.emitKeyUpEvent(e, "<array>", this.value);
           }
         });
-        element.addEventListener("onKeyDown", (e: Event) => {
-          if (!isCustomEvent(e)) return;
 
-          if (e.detail.key === "Backspace" && e.detail.inputStr === "") {
-            // Remove the item
-            this.removeItem(e, i);
+        removeButton.tabIndex = -1;
+        removeButton.onclick = (e: Event) => {
+          e.preventDefault();
+          this.removeItem(e, contentItem.index);
+        };
 
-            last(
-              this.content?.itemsContainer.querySelectorAll<HTMLInputElement>(
-                "input, textarea"
-              )
-            )?.focus();
-          }
-        });
+        element.path = `${this.path}[${contentItem.index}]`;
+
+        let keyDownValueStr = `${this.value[contentItem.index]}`;
 
         container.appendChild(removeButton);
         container.appendChild(element);
         this.content.itemsContainer.appendChild(container);
-
-        this.content.items.push({
-          container,
-          removeButton,
-          element,
-        });
       }
       const item = this.content.items[i];
+
+      item.index = i;
 
       item.removeButton.textContent = this.renderOptions.dictionary.removeItem;
       item.removeButton.title =
         this.renderOptions.dictionary.removeItemDescription;
 
       item.element.update({
-        data: this.data[i],
+        value: this.value[i],
         schema: schemaItems,
         renderOptions: this.renderOptions,
       });
@@ -212,7 +229,7 @@ export class GDDTable extends GDDElementBase {
     if (!this.schema.items) return initialRender;
     const schemaItems = this.schema.items;
 
-    if (!this.data) this.data = [];
+    if (!this.value) this.value = [];
 
     if (!this.content) {
       initialRender = true;
@@ -227,23 +244,23 @@ export class GDDTable extends GDDElementBase {
 
       this.content.elAddButton.onclick = (e) => {
         e.preventDefault();
-        this.data.push(getDefaultDataFromSchema(schemaItems));
+        this.value.push(getDefaultDataFromSchema(schemaItems));
         this.render();
-        this.emitOnChange(this.data);
+        this.emitChangeEvent(this.value);
       };
       this.appendChild(this.content.elAddButton);
     }
 
     this._renderTopRow(this.content.elTrTop);
 
-    for (const elLine of this.content.rows.splice(this.data.length)) {
+    for (const elLine of this.content.rows.splice(this.value.length)) {
       // for (const row of elLine.rows) {
       //   row.element.removeEventListener()
       // }
       this.content.elTable.removeChild(elLine.tr);
     }
 
-    for (let i = 0; i < this.data.length; i++) {
+    for (let i = 0; i < this.value.length; i++) {
       if (!this.content.rows[i]) {
         const tr = document.createElement("tr");
         const removeButton = document.createElement("button");
@@ -257,9 +274,9 @@ export class GDDTable extends GDDElementBase {
         tdEnd.onclick = (e: Event) => {
           e.preventDefault();
 
-          this.data.splice(i, 1);
-          this.emitOnKeyUp(e, "<array>", this.data);
-          this.emitOnChange(this.data);
+          this.value.splice(i, 1);
+          this.emitKeyUpEvent(e, "<array>", this.value);
+          this.emitChangeEvent(this.value);
           this.render();
         };
 
@@ -280,14 +297,14 @@ export class GDDTable extends GDDElementBase {
           const properties = Object.entries(schemaItems.properties);
 
           for (const field of contentRow.fields.splice(properties.length)) {
+            field.element.destroy();
             contentRow.tr.removeChild(field.td);
-            // field.element.removeEventListener()
           }
 
           for (let j = 0; j < properties.length; j++) {
             const key = properties[j][0];
             const schema = properties[j][1];
-            const data = this.data[i][key];
+            const value = this.value[i][key];
 
             if (!contentRow.fields[j]) {
               const td = document.createElement("td");
@@ -300,25 +317,25 @@ export class GDDTable extends GDDElementBase {
               td.appendChild(el);
               contentRow.tr.appendChild(td);
 
-              el.addEventListener("onChange", (e: Event) => {
+              el.addListener("change", (e: Event) => {
                 if (!(e instanceof CustomEvent)) return;
                 e.stopPropagation();
-                this.data[i][key] = e.detail.data;
+                this.value[i][key] = e.detail.value;
 
-                this.emitOnChange(this.data);
+                this.emitChangeEvent(this.value);
               });
-              el.addEventListener("onKeyUp", (e: Event) => {
+              el.addListener("keyup", (e: Event) => {
                 if (!(e instanceof CustomEvent)) return;
                 e.stopPropagation();
-                this.data[i][key] = e.detail.data;
-                this.emitOnKeyUp(e, "<array>", this.data);
+                this.value[i][key] = e.detail.value;
+                this.emitKeyUpEvent(e, "<array>", this.value);
               });
             }
             const field = contentRow.fields[j];
 
             field.element.update({
               schema: schema,
-              data: data,
+              value: value,
               renderOptions: this.renderOptions,
             });
           }
@@ -329,18 +346,22 @@ export class GDDTable extends GDDElementBase {
 
       contentRow.removeButton.textContent =
         this.renderOptions.dictionary.removeRow;
-
-      // this.content.rows[i].element.update({
-      //   schema: schemaItems,
-      //   data: rowData,
-      //   renderOptions: this.renderOptions,
-      // });
     }
 
     this.content.elAddButton.textContent = this.renderOptions.dictionary.addRow;
 
     this._renderStyle();
     return initialRender;
+  }
+  destroy(): void {
+    super.destroy();
+    if (this.content) {
+      for (const row of this.content.rows) {
+        for (const field of row.fields) {
+          field.element.destroy();
+        }
+      }
+    }
   }
   private _renderStyle() {
     if (this.renderOptions.formStyle === "default") {
@@ -353,7 +374,7 @@ export class GDDTable extends GDDElementBase {
 
     elParent.innerHTML = "";
 
-    if (this.data.length === 0) return;
+    if (this.value.length === 0) return;
 
     const elTh = document.createElement("th");
     elParent.appendChild(elTh);
@@ -372,7 +393,7 @@ export class GDDTable extends GDDElementBase {
 }
 export class GDDArrayProperty extends GDDElementBase {
   private content: {
-    content: GDDElementBase;
+    element: GDDElementBase;
     contentError: HTMLDivElement;
   } | null = null;
 
@@ -381,47 +402,55 @@ export class GDDArrayProperty extends GDDElementBase {
   }
   connectedCallback(): void {}
 
+  destroy() {
+    super.destroy();
+    if (this.content) {
+      this.content.element.destroy();
+    }
+  }
+
   render(): boolean {
     let initialRender = false;
     if (!this.schema) return initialRender;
 
     if (!this.content) {
+      const element = getGDDElement(this.schema, this.path);
       this.content = {
-        content: getGDDElement(this.schema, this.path),
+        element,
         contentError: document.createElement("div"),
       };
 
       // Listen to events to update validation error:
-      this.content.content.addEventListener("onChange", (e: any) => {
-        if (isCustomEvent(e) && this.content && this.schema) {
+      this.content.element.addListener("change", (e: any) => {
+        if (isCustomEventKey(e) && this.content && this.schema) {
           renderContentError(
             this.content.contentError,
             this.schema,
-            e.detail.data
+            e.detail.value
           );
         }
       });
-      this.content.content.addEventListener("onKeyUp", (e: any) => {
-        if (isCustomEvent(e) && this.content && this.schema) {
+      this.content.element.addListener("keyup", (e: any) => {
+        if (isCustomEventKey(e) && this.content && this.schema) {
           renderContentError(
             this.content.contentError,
             this.schema,
-            e.detail.data
+            e.detail.value
           );
         }
       });
 
-      this.appendChild(this.content.content);
+      this.appendChild(this.content.element);
     }
-    this.content.content.update({
+    this.content.element.update({
       schema: this.schema,
-      data: this.data,
+      value: this.value,
       renderOptions: this.renderOptions,
     });
     // this.content.label.textContent = this.schema.title || "";
     // this.content.label.title = this.schema.description || "";
 
-    renderContentError(this.content.contentError, this.schema, this.data);
+    renderContentError(this.content.contentError, this.schema, this.value);
 
     this._renderStyle();
     return initialRender;

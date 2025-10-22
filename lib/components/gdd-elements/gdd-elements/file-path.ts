@@ -15,24 +15,9 @@ export class GDDFilePath extends GDDInputBase {
       this.elInput.accept =
         schema.gddOptions.extensions.map((e) => `.${e}`).join(",") || "*";
       this.elInput.name = this.path;
-
-      // this.elInput.style.fontFamily = "monospace";
-
-      this.elInput.onchange = (e) => {
-        if (!e.target) return;
-        this.emitOnChange((e.target as any).value);
-      };
-      this.elInput.onkeydown = (e) => {
-        if (!e.target) return;
-        this.emitOnKeyDown(e, (e.target as any).value, (e.target as any).value);
-      };
-      this.elInput.onkeyup = (e) => {
-        if (!e.target) return;
-        this.emitOnKeyUp(e, (e.target as any).value, (e.target as any).value);
-      };
     }
 
-    this.elInput.value = this.data || "";
+    this.elInput.value = this.value || "";
     this._renderStyle();
 
     return initialRender;

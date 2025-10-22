@@ -19,21 +19,31 @@ export class SuperFlyTvOgrafDataForm extends HTMLElement {
   connectedCallback(): void {
     this.appendChild(this.elError);
 
-    // Check this.data attribute, set to default if not present:
-    if (this.schema !== null && this.data === null) {
-      const newData = getDefaultDataFromSchema(this.schema);
+    // Check this.value attribute, set to default value if not present:
+    if (this.schema !== null && this.value === null) {
+      const newValue = getDefaultDataFromSchema(this.schema);
 
-      if (!isEqual(this.data, newData)) {
-        this.data = newData;
-        // Emit onChange event, so that any listeners are aware of the new data:
-        this.dispatchEvent(GDDElementBase.getOnChangeEvent(this.data));
+      if (!isEqual(this.value, newValue)) {
+        this.value = newValue;
+
+        // Emit change event, so that any listeners are aware of the new value:
+        this.dispatchEvent(GDDElementBase.getChangeEvent(this.value));
       }
     }
 
     this.render();
   }
+
   static get observedAttributes() {
-    return ["schema", "data", "formStyle", "dictionary"];
+    return [
+      "schema",
+      "value",
+      "formStyle",
+      "dictionary",
+      "onchange",
+      "onkeydown",
+      "onkeyup",
+    ];
   }
   get schema(): GDDSchema | null {
     const schema = this.getAttribute("schema");
@@ -43,15 +53,15 @@ export class SuperFlyTvOgrafDataForm extends HTMLElement {
   set schema(value: GDDSchema) {
     this.setAttribute("schema", JSON.stringify(value));
   }
-  get data(): any | null {
-    const data = this.getAttribute("data");
-    if (data === "") return null;
-    if (typeof data === "string") return JSON.parse(data);
-    return data;
+  get value(): any | null {
+    const value = this.getAttribute("value");
+    if (value === "") return undefined;
+    if (typeof value === "string") return JSON.parse(value);
+    return value;
   }
-  set data(value: any) {
+  set value(value: any) {
     this.setAttribute(
-      "data",
+      "value",
       typeof value === "string" ? value : JSON.stringify(value)
     );
   }
@@ -75,17 +85,9 @@ export class SuperFlyTvOgrafDataForm extends HTMLElement {
   }
 
   attributeChangedCallback(name: string, _oldValue: any, _newValue: any): void {
-    if (name === "data" || name === "schema") {
+    if (name === "value" || name === "schema") {
       this.render();
     }
-  }
-  onDataUpdated(data: unknown) {
-    const event = new CustomEvent("data-updated", {
-      bubbles: true,
-      cancelable: false,
-      detail: { data },
-    });
-    this.dispatchEvent(event);
   }
 
   private render() {
@@ -110,10 +112,32 @@ export class SuperFlyTvOgrafDataForm extends HTMLElement {
 
     if (!this.elContent) {
       if (this.schema) {
-        this.elContent = getGDDElement(this.schema, "data");
+        this.elContent = getGDDElement(this.schema, "");
         this.elForm.appendChild(this.elContent);
-        this.elContent.addEventListener("data-updated", (data) => {
-          this.onDataUpdated(data);
+
+        this.elContent.addEventListener("change", (e) => {
+          if (!(e instanceof CustomEvent)) return;
+
+          // Update this.value at this point, so that e.target.value is correct
+          // for any listeners further up the chain:
+          this.value = e.detail.value;
+
+          // Re-emit the event, so that the target becomes this form:
+          e.stopPropagation();
+          this.dispatchEvent(GDDElementBase.getChangeEvent(this.value));
+        });
+        this.elContent.addEventListener("keyup", (e) => {
+          if (!(e instanceof CustomEvent)) return;
+
+          // Update this.value at this point, so that e.target.value is correct
+          // for any listeners further up the chain:
+          this.value = e.detail.value;
+
+          // Re-emit the event, so that the target becomes this form:
+          e.stopPropagation();
+          this.dispatchEvent(
+            GDDElementBase.getKeyUpEvent(e, e.detail.valueStr, this.value)
+          );
         });
       }
     }
@@ -122,7 +146,7 @@ export class SuperFlyTvOgrafDataForm extends HTMLElement {
     if (this.elContent && this.schema) {
       this.elContent.update({
         schema: this.schema,
-        data: this.data,
+        value: this.value,
         renderOptions: {
           formStyle,
         },

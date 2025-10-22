@@ -5,15 +5,19 @@ import type { Options, RenderOptions } from "./lib.js";
 export abstract class GDDElementBase extends HTMLElement {
   public path: string = "";
   protected schema: GDDSchema | null = null;
-  protected data: any = null;
+  protected value: any = null;
   protected renderOptions: RenderOptions = {
     dictionary: DEFAULT_DICTIONARY,
     formStyle: "",
   };
 
+  destroy(): void {
+    this.removeAllListeners();
+  }
+
   update(options: Options) {
     this.schema = options.schema;
-    this.data = options.data;
+    this.value = options.value;
     if (options.renderOptions)
       this.renderOptions = {
         ...this.renderOptions,
@@ -29,51 +33,83 @@ export abstract class GDDElementBase extends HTMLElement {
   /** Returns true on initial render */
   abstract render(): boolean;
 
-  static getOnChangeEvent(data: any) {
-    return new CustomEvent("onChange", {
-      bubbles: true,
-      cancelable: false,
-      detail: { data },
-    });
-  }
-
-  protected emitOnChange(data: any) {
-    this.dispatchEvent(GDDElementBase.getOnChangeEvent(data));
-  }
-
-  protected emitOnKeyDown(e: Event, inputStr: string, data: any) {
-    const detail: CustomEventDetail["detail"] = {
-      data,
-      inputStr,
-      key: (e as any).key,
+  static getChangeEvent(value: any): CustomEvent {
+    const detail: CustomEventChange["detail"] = {
+      value,
     };
-    const event = new CustomEvent("onKeyDown", {
+
+    return new CustomEvent("change", {
       bubbles: true,
       cancelable: false,
       detail,
     });
-    this.dispatchEvent(event);
   }
-  protected emitOnKeyUp(e: Event, inputStr: string, data: any) {
-    const detail: CustomEventDetail["detail"] = {
-      data,
-      inputStr,
+  protected emitChangeEvent(value: any) {
+    this.dispatchEvent(GDDElementBase.getChangeEvent(value));
+  }
+
+  private listeners: { [key: string]: (...args: any[]) => void } = {};
+  /**
+   * Like addEventListener, but keeps track of listeners to allow easy removal later
+   * @param type
+   * @param listener
+   */
+  addListener(type: string, listener: (...args: any[]) => void) {
+    this.listeners[type] = listener;
+    this.addEventListener(type, listener);
+  }
+  removeAllListeners() {
+    for (const [key, listener] of Object.entries(this.listeners)) {
+      this.removeEventListener(key, listener);
+    }
+    this.listeners = {};
+  }
+
+  static getKeyDownEvent(e: Event, valueStr: string, value: any): CustomEvent {
+    const detail: CustomEventKey["detail"] = {
+      value,
+      valueStr,
       key: (e as any).key,
     };
-    const event = new CustomEvent("onKeyUp", {
+    return new CustomEvent("keydown", {
       bubbles: true,
       cancelable: false,
       detail,
     });
-    this.dispatchEvent(event);
+  }
+  protected emitKeyDownEvent(e: Event, valueStr: string, value: any) {
+    this.dispatchEvent(GDDElementBase.getKeyDownEvent(e, valueStr, value));
+  }
+
+  static getKeyUpEvent(e: Event, valueStr: string, value: any) {
+    const detail: CustomEventKey["detail"] = {
+      value,
+      valueStr,
+      key: (e as any).key,
+    };
+    return new CustomEvent("keyup", {
+      bubbles: true,
+      cancelable: false,
+      detail,
+    });
+  }
+  protected emitKeyUpEvent(e: Event, valueStr: string, value: any) {
+    this.dispatchEvent(GDDElementBase.getKeyUpEvent(e, valueStr, value));
   }
 }
 
-export type CustomEventDetail = CustomEvent<{
-  data: any;
-  inputStr: string;
+export type CustomEventChange = CustomEvent<{
+  value: any;
+}>;
+export function isCustomEventChange(e: Event): e is CustomEventChange {
+  return e instanceof CustomEvent && e.detail.key == undefined;
+}
+
+export type CustomEventKey = CustomEvent<{
+  value: any;
+  valueStr: string;
   key: KeyboardEvent["key"];
 }>;
-export function isCustomEvent(e: Event): e is CustomEventDetail {
-  return e instanceof CustomEvent;
+export function isCustomEventKey(e: Event): e is CustomEventKey {
+  return e instanceof CustomEvent && e.detail.key !== undefined;
 }

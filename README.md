@@ -10,7 +10,7 @@ This is a Web Component for generating input forms from [OGraf/GDD](https://ogra
 npm install ograf-form
 ```
 
-Or you can use a CDN: `https://cdn.jsdelivr.net/npm/ograf-form/dist/main.js);`
+Or you can use a CDN: `https://cdn.jsdelivr.net/npm/ograf-form);`
 
 ### Example usage
 
@@ -26,7 +26,7 @@ Or you can use a CDN: `https://cdn.jsdelivr.net/npm/ograf-form/dist/main.js);`
   <body>
     <script
       type="module"
-      src="https://cdn.jsdelivr.net/npm/ograf-form/dist/main.js"
+      src="https://cdn.jsdelivr.net/npm/ograf-form"
     ></script>
     <!-- <script type="module" src="/dist/main.js"></script> -->
 
@@ -42,15 +42,15 @@ Or you can use a CDN: `https://cdn.jsdelivr.net/npm/ograf-form/dist/main.js);`
       // Listen to changes:
       const form = document.getElementById("ograf-form");
       const dataDiv = document.getElementById("data");
-      form.addEventListener("onChange", (e) => {
-        console.log("Caught onChange event", e.detail.data);
-        // The onChange event is fired when a user changes a value in the form
+      form.addEventListener("change", (e) => {
+        console.log("Caught change event", e.target.value);
+        // The change event is fired when a user changes a value in the form
         // It does NOT fire on each key stroke.
         // This is a good time to update our data object:
-        dataDiv.innerHTML = JSON.stringify(e.detail.data, null, 2);
+        dataDiv.innerHTML = JSON.stringify(e.target.value, null, 2);
       });
-      form.addEventListener("onKeyUp", (e) => {
-        console.log("Caught onKeyUp event", e.detail.data);
+      form.addEventListener("keyup", (e) => {
+        console.log("Caught keyup event", e.target.value);
       });
     </script>
   </body>
@@ -75,3 +75,8 @@ yarn release
 
 
 ```
+
+## TODO
+
+- Support `patternProperties`, `additionalProperties`, `unevaluatedProperties`
+- Support tuples (`prefixItems` / `items` as array) & `additionalItems`

@@ -13,38 +13,43 @@ export abstract class GDDInputNumberBase extends GDDInputBase {
       this.elInput.onchange = (e) => {
         if (!e.target) return;
         if (!(e.target instanceof HTMLInputElement)) return;
+        e.stopPropagation();
 
         const input = e.target.value;
         const value = this._parseInput(input);
         if (value === null) {
           // invalid input, revert
-          e.target.value = this._stringifyValue(this.data);
+          e.target.value = this._stringifyValue(this.value);
         } else {
-          if (this.data !== value) {
-            this.data = value;
-            this.emitOnChange(this.data);
+          if (this.value !== value) {
+            this.value = value;
+            this.emitChangeEvent(this.value);
           }
           e.target.value = this._stringifyValue(value);
         }
       };
 
       this.elInput.onkeydown = (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          // Prevent form submission
+        }
         if (!e.target) return;
+
         if (!(e.target instanceof HTMLInputElement)) return;
-
+        e.stopPropagation();
         const input = e.target.value;
-
-        this.emitOnKeyDown(e, input, this._parseInput(input));
+        this.emitKeyDownEvent(e, input, this._parseInput(input));
       };
       this.elInput.onkeyup = (e) => {
         if (!e.target) return;
         if (!(e.target instanceof HTMLInputElement)) return;
+        e.stopPropagation();
         const input = e.target.value;
-
-        this.emitOnKeyUp(e, input, this._parseInput(input));
+        this.emitKeyUpEvent(e, input, this._parseInput(input));
       };
     }
-    this.elInput.value = this._stringifyValue(this.data);
+    this.elInput.value = this._stringifyValue(this.value);
     return initialRender;
   }
 

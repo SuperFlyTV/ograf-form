@@ -59,7 +59,6 @@ export function getGDDElement(schema: GDDSchema, path: string): GDDElementBase {
     throw new Error(`Unsupported GDD type: ${basicType}`);
   }
 
-  element.path = path;
   return element;
 }
 export function getBasicType(schemaType: GDDSchema["type"]): GDDTypeName {
