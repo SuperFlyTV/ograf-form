@@ -7,7 +7,6 @@ export class GDDString extends GDDInputBase {
     if (!this.elInput) return initialRender;
 
     this.elInput.type = "text";
-    this.elInput.name = this.path;
 
     this.elInput.onchange = (e) => {
       if (!e.target) return;

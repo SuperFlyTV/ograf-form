@@ -1,7 +1,6 @@
 import { getDefaultDataFromSchema } from "../../../lib/default-data.js";
 import { nthInIterable } from "../../../lib/lib.js";
 import { GDDElementBase, isCustomEventKey } from "../lib/_base.js";
-import { getGDDElement } from "../index.js";
 import { renderContentError } from "../lib/lib.js";
 
 export class GDDArray extends GDDElementBase {
@@ -14,9 +13,15 @@ export class GDDArray extends GDDElementBase {
     if (!this.elContent) {
       initialRender = true;
       if (this.schema.items.type === "object" && this.schema.items.properties) {
-        this.elContent = new GDDTable();
+        this.elContent = new GDDTable({
+          path: this.path,
+          getGDDElement: this.getGDDElement,
+        });
       } else {
-        this.elContent = new GDDSimpleArray();
+        this.elContent = new GDDSimpleArray({
+          path: this.path,
+          getGDDElement: this.getGDDElement,
+        });
       }
       this.appendChild(this.elContent);
     }
@@ -91,11 +96,15 @@ export class GDDSimpleArray extends GDDElementBase {
     }
 
     for (let i = 0; i < this.value.length; i++) {
+      const itemPath = `${this.path}[${i}]`;
       if (!this.content.items[i]) {
         const container = document.createElement("div");
         container.className = "gdd-simple-array-item";
         const removeButton = document.createElement("button");
-        const element = new GDDArrayProperty();
+        const element = new GDDArrayProperty({
+          path: itemPath,
+          getGDDElement: this.getGDDElement,
+        });
 
         const contentItem = {
           container,
@@ -164,8 +173,6 @@ export class GDDSimpleArray extends GDDElementBase {
           this.removeItem(e, contentItem.index);
         };
 
-        element.path = `${this.path}[${contentItem.index}]`;
-
         let keyDownValueStr = `${this.value[contentItem.index]}`;
 
         container.appendChild(removeButton);
@@ -173,6 +180,7 @@ export class GDDSimpleArray extends GDDElementBase {
         this.content.itemsContainer.appendChild(container);
       }
       const item = this.content.items[i];
+      item.element.path = itemPath;
 
       item.index = i;
 
@@ -308,8 +316,10 @@ export class GDDTable extends GDDElementBase {
 
             if (!contentRow.fields[j]) {
               const td = document.createElement("td");
-              const el = new GDDArrayProperty();
-              el.path = `${this.path}[${i}].${key}`;
+              const el = new GDDArrayProperty({
+                path: `${this.path}[${i}].${key}`,
+                getGDDElement: this.getGDDElement,
+              });
               contentRow.fields.push({
                 td,
                 element: el,
@@ -397,9 +407,6 @@ export class GDDArrayProperty extends GDDElementBase {
     contentError: HTMLDivElement;
   } | null = null;
 
-  constructor() {
-    super();
-  }
   connectedCallback(): void {}
 
   destroy() {
@@ -414,7 +421,11 @@ export class GDDArrayProperty extends GDDElementBase {
     if (!this.schema) return initialRender;
 
     if (!this.content) {
-      const element = getGDDElement(this.schema, this.path);
+      const element = this.getGDDElement({
+        schema: this.schema,
+        path: this.path,
+        getGDDElement: this.getGDDElement,
+      });
       this.content = {
         element,
         contentError: document.createElement("div"),

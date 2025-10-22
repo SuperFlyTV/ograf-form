@@ -1,9 +1,29 @@
-import { isEqual } from "../lib/lib.js";
-import type { GDDSchema } from "../lib/types.js";
-import { validateGDDSchema } from "../lib/validate-schema.js";
-import { getDefaultDataFromSchema } from "../main.js";
-import { GDDElementBase, getGDDElement } from "./gdd-elements/index.js";
-import type { Dictionary } from "./gdd-elements/lib/lib.js";
+import { assertNever, isEqual } from "../lib/lib.js";
+import {
+  DEFAULT_DICTIONARY,
+  type Dictionary,
+  type GetGDDElementFunction,
+} from "./gdd-elements/lib/_base.js";
+
+import type { GDDSchema } from "../main.js";
+import {
+  validateGDDSchema,
+  getBasicType,
+  getDefaultDataFromSchema,
+  GDDElementBase,
+  GDDMultiLineText,
+  GDDFilePath,
+  GDDSelect,
+  GDDColorRRGGBB,
+  GDDColorRRGGBBAA,
+  GDDPercentage,
+  GDDObject,
+  GDDArray,
+  GDDString,
+  GDDInteger,
+  GDDBoolean,
+  GDDNumber,
+} from "../main.js";
 
 export class SuperFlyTvOgrafDataForm extends HTMLElement {
   private elError = document.createElement("div");
@@ -72,17 +92,70 @@ export class SuperFlyTvOgrafDataForm extends HTMLElement {
   set formStyle(formStyle: string) {
     this.setAttribute("formStyle", formStyle);
   }
-  get dictionary(): Dictionary | null {
-    const dictionary = this.getAttribute("dictionary");
+  get dictionary(): Partial<Dictionary> {
+    const dictionary = this.getAttribute("dictionary") ?? {};
     if (typeof dictionary === "string") return JSON.parse(dictionary);
     return dictionary;
   }
-  set dictionary(value: Dictionary) {
+  set dictionary(value: Partial<Dictionary>) {
     this.setAttribute(
       "dictionary",
       typeof value === "string" ? value : JSON.stringify(value)
     );
   }
+  public getGDDElement?: GetGDDElementFunctionOptional;
+
+  private _getGDDElement: GetGDDElementFunction = (props): GDDElementBase => {
+    // First, use the custom getGDDElement function, if provided:
+    const element0 = this.getGDDElement?.(props);
+    if (element0) return element0;
+
+    // Then, use the default implementation:
+    const basicType = getBasicType(props.schema.type);
+
+    const options = {
+      path: props.path,
+      getGDDElement: props.getGDDElement,
+    };
+    const gddType = props.schema.gddType + "/";
+
+    // Go through types in order of most specific to least specific:
+
+    if (basicType === "string" && gddType.startsWith("multi-line/"))
+      return new GDDMultiLineText(options);
+
+    if (basicType === "string" && gddType.startsWith("file-path/"))
+      return new GDDFilePath(options);
+
+    if (
+      (basicType === "string" ||
+        basicType === "integer" ||
+        basicType === "number") &&
+      gddType.startsWith("select/")
+    )
+      return new GDDSelect(options);
+
+    if (basicType === "string" && gddType.startsWith("color-rrggbb/"))
+      return new GDDColorRRGGBB(options);
+
+    if (basicType === "string" && gddType.startsWith("color-rrggbbaa/"))
+      return new GDDColorRRGGBBAA(options);
+
+    if (basicType === "number" && gddType.startsWith("percentage/"))
+      return new GDDPercentage(options);
+
+    // Finally, resort to one of the basic types:
+    if (basicType === "object") return new GDDObject(options);
+    if (basicType === "array") return new GDDArray(options);
+    if (basicType === "string") return new GDDString(options);
+    if (basicType === "integer") return new GDDInteger(options);
+    if (basicType === "boolean") return new GDDBoolean(options);
+    if (basicType === "number") return new GDDNumber(options);
+
+    // else:
+    assertNever(basicType);
+    throw new Error(`Unsupported GDD type: ${basicType}`);
+  };
 
   attributeChangedCallback(name: string, _oldValue: any, _newValue: any): void {
     if (name === "value" || name === "schema") {
@@ -112,7 +185,12 @@ export class SuperFlyTvOgrafDataForm extends HTMLElement {
 
     if (!this.elContent) {
       if (this.schema) {
-        this.elContent = getGDDElement(this.schema, "");
+        this.elContent = this._getGDDElement({
+          schema: this.schema,
+          path: "data",
+          getGDDElement: this._getGDDElement,
+        });
+
         this.elForm.appendChild(this.elContent);
 
         this.elContent.addEventListener("change", (e) => {
@@ -149,6 +227,7 @@ export class SuperFlyTvOgrafDataForm extends HTMLElement {
         value: this.value,
         renderOptions: {
           formStyle,
+          dictionary: { ...DEFAULT_DICTIONARY, ...this.dictionary },
         },
       });
     }
@@ -174,4 +253,9 @@ export class SuperFlyTvOgrafDataForm extends HTMLElement {
     return null;
   }
 }
+
+export type GetGDDElementFunctionOptional = (
+  props: Parameters<GetGDDElementFunction>[0]
+) => GDDElementBase | undefined;
+
 window.customElements.define("superflytv-ograf-form", SuperFlyTvOgrafDataForm);

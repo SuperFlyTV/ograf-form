@@ -1,13 +1,8 @@
 import { GDDElementBase, isCustomEventKey } from "../lib/_base.js";
-import { getBasicType, getGDDElement } from "../index.js";
-import { renderContentError } from "../lib/lib.js";
+import { getBasicType, renderContentError } from "../lib/lib.js";
 
 export class GDDObject extends GDDElementBase {
   private content: Record<string, GDDElementBase> = {};
-
-  constructor() {
-    super();
-  }
 
   render(): boolean {
     if (!this.value) this.value = {};
@@ -27,8 +22,10 @@ export class GDDObject extends GDDElementBase {
     for (const [key, schema] of properties) {
       existingKeys.add(key);
       if (!this.content[key]) {
-        const el = new GDDObjectProperty();
-        el.path = `${this.path}.${key}`;
+        const el = new GDDObjectProperty({
+          path: `${this.path}.${key}`,
+          getGDDElement: this.getGDDElement,
+        });
         this.content[key] = el;
         this.appendChild(el);
 
@@ -111,7 +108,11 @@ export class GDDObjectProperty extends GDDElementBase {
         // labelContainer: document.createElement("div"),
         label: document.createElement("label"),
         description: document.createElement("span"),
-        content: getGDDElement(this.schema, this.path),
+        content: this.getGDDElement({
+          schema: this.schema,
+          path: this.path,
+          getGDDElement: this.getGDDElement,
+        }),
         contentError: document.createElement("div"),
       };
 

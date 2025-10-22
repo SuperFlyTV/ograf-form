@@ -10,6 +10,7 @@ export abstract class GDDInputBase extends GDDElementBase {
       this.elInput = document.createElement("input");
       this.appendChild(this.elInput);
 
+      this.elInput.name = this.path;
       this.elInput.onchange = (e) => {
         if (!e.target) return;
         if (!(e.target instanceof HTMLInputElement)) return;

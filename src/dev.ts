@@ -6,6 +6,14 @@ import { SuperFlyTvOgrafDataForm } from "../lib/main.js";
   The actual components are in lib/*
 */
 
+// class TMP_GDD extends GDDElementBase {
+//   render(): boolean {
+//     this.innerHTML = "TMPGDD";
+//     return false;
+//   }
+// }
+// window.customElements.define("tmp-gdd", TMP_GDD);
+
 const app = document.querySelector<HTMLDivElement>("#app") as HTMLDivElement;
 
 function renderSchema(schema: any) {
@@ -40,6 +48,24 @@ function renderSchema(schema: any) {
   });
   form.schema = schema as any;
   // form.value = value;
+
+  // Example of custom getGDDElement function:
+  // form.getGDDElement = (props) => {
+  //   const baseType = getBasicType(props.schema.type);
+  //   if (baseType === "string") {
+  //     return new TMP_GDD({
+  //       path: props.path,
+  //       getGDDElement: props.getGDDElement,
+  //     });
+  //   }
+  // };
+  // Set dictionary
+  // form.dictionary = {
+  //   addItem: "Ajouter",
+  //   removeItem: "Supprimer",
+  //   addRow: "Ajouter",
+  //   removeRow: "Supprimer",
+  // };
 
   // dataDiv.innerHTML = JSON.stringify(value, null, 2);
 

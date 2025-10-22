@@ -1,15 +1,25 @@
 import type { GDDSchema } from "../../../lib/types.js";
-import { DEFAULT_DICTIONARY } from "./lib.js";
-import type { Options, RenderOptions } from "./lib.js";
 
 export abstract class GDDElementBase extends HTMLElement {
   public path: string = "";
+  protected getGDDElement: GetGDDElementFunction;
+
   protected schema: GDDSchema | null = null;
   protected value: any = null;
   protected renderOptions: RenderOptions = {
     dictionary: DEFAULT_DICTIONARY,
     formStyle: "",
   };
+
+  constructor(options: { path: string; getGDDElement: GetGDDElementFunction }) {
+    super();
+    if (!options.path) throw new Error("Missing constructor path argument");
+    if (!options.getGDDElement)
+      throw new Error("Missing constructor getGddElement argument");
+
+    this.path = options.path;
+    this.getGDDElement = options.getGDDElement;
+  }
 
   destroy(): void {
     this.removeAllListeners();
@@ -27,7 +37,7 @@ export abstract class GDDElementBase extends HTMLElement {
     try {
       this.render();
     } catch (error) {
-      console.error;
+      console.error(error);
     }
   }
   /** Returns true on initial render */
@@ -113,3 +123,35 @@ export type CustomEventKey = CustomEvent<{
 export function isCustomEventKey(e: Event): e is CustomEventKey {
   return e instanceof CustomEvent && e.detail.key !== undefined;
 }
+
+/**
+ * Method that returns a WebComponent representing the GDD Schema at the given path
+ */
+export type GetGDDElementFunction = (props: {
+  /** The GDD Schema */
+  schema: GDDSchema;
+  /** Breadcrumbs-style path to the property */
+  path: string;
+  /** Reference to the GetGDDElementFunction to use for inner properties */
+  getGDDElement: GetGDDElementFunction;
+}) => GDDElementBase;
+
+export interface Options {
+  schema: GDDSchema;
+  value: any;
+  renderOptions?: Partial<RenderOptions>;
+}
+export interface RenderOptions {
+  formStyle: string | "" | "default";
+  dictionary: Dictionary;
+}
+
+export const DEFAULT_DICTIONARY = {
+  addRow: "Add Row",
+  removeRow: "Remove",
+  addItem: "Add",
+  removeItem: " - ",
+  addItemDescription: "Add item",
+  removeItemDescription: "Remove item",
+};
+export type Dictionary = typeof DEFAULT_DICTIONARY;
