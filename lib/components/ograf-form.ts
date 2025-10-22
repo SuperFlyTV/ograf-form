@@ -104,6 +104,7 @@ export class SuperFlyTvOgrafDataForm extends HTMLElement {
     );
   }
   public getGDDElement?: GetGDDElementFunctionOptional;
+  public postRender?: () => void;
 
   private _getGDDElement: GetGDDElementFunction = (props): GDDElementBase => {
     // First, use the custom getGDDElement function, if provided:
@@ -232,6 +233,8 @@ export class SuperFlyTvOgrafDataForm extends HTMLElement {
       });
     }
     this._renderStyle(formStyle);
+
+    this.postRender?.();
   }
   private _renderStyle(formStyle: string) {
     if (formStyle === "default") {

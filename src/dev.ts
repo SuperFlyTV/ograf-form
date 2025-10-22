@@ -67,6 +67,11 @@ function renderSchema(schema: any) {
   //   removeRow: "Supprimer",
   // };
 
+  // form.postRender = () => {
+  //   form
+  //     .querySelectorAll('input[type="text"]')
+  //     .forEach((el: HTMLInputElement) => (el.style.backgroundColor = "#933"));
+  // };
   // dataDiv.innerHTML = JSON.stringify(value, null, 2);
 
   container.appendChild(form);
