@@ -1,3 +1,4 @@
+import { clone, isEqual } from "../../../lib/lib.js";
 import type { GDDSchema } from "../../../lib/types.js";
 
 export abstract class GDDElementBase extends HTMLElement {
@@ -53,6 +54,13 @@ export abstract class GDDElementBase extends HTMLElement {
       cancelable: false,
       detail,
     });
+  }
+  private lastEmittedChangedValue: any = "____N/A_____";
+  protected shouldValueBeEmitted(value: any): boolean {
+    if (!isEqual(value, this.lastEmittedChangedValue)) {
+      this.lastEmittedChangedValue = clone(value);
+      return true;
+    } else return false;
   }
   protected emitChangeEvent(value: any) {
     this.dispatchEvent(GDDElementBase.getChangeEvent(value));

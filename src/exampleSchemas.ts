@@ -1,5 +1,16 @@
 import type { GDDSchema } from "../lib/lib/types.js";
 
+export const simple: GDDSchema = {
+  type: "object",
+  properties: {
+    name: {
+      type: "integer",
+      // gddType: "single-line",
+      // default: "My Table",
+      // description: "This is the name of the thing",
+    },
+  },
+};
 export const table: GDDSchema = {
   type: "object",
   properties: {

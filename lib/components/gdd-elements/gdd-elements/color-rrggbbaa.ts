@@ -31,10 +31,10 @@ export class GDDColorRRGGBBAA extends GDDColorRRGGBB {
             // invalid input, revert
             e.target.value = `${this._alpha}` || "";
           } else {
-            if (this.value !== int) {
-              this._alpha = int;
-
-              this.emitChangeEvent(this.getRRGGBBAA(this._rrggbb, this._alpha));
+            this._alpha = int;
+            const emitValue = this.getRRGGBBAA(this._rrggbb, this._alpha);
+            if (this.shouldValueBeEmitted(emitValue)) {
+              this.emitChangeEvent(emitValue);
             }
             e.target.value = `${int}`;
           }

@@ -21,8 +21,9 @@ export abstract class GDDInputNumberBase extends GDDInputBase {
           // invalid input, revert
           e.target.value = this._stringifyValue(this.value);
         } else {
-          if (this.value !== value) {
+          if (this.shouldValueBeEmitted(value)) {
             this.value = value;
+
             this.emitChangeEvent(this.value);
           }
           e.target.value = this._stringifyValue(value);

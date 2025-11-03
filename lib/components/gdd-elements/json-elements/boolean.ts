@@ -16,10 +16,10 @@ export class GDDBoolean extends GDDInputBase {
 
         const checked = Boolean(e.target.checked);
 
-        if (this.value !== checked) {
-          this.value = checked;
+        this.value = checked;
+        if (this.shouldValueBeEmitted(checked)) {
           this.emitKeyUpEvent(e, "", checked);
-          this.emitChangeEvent(this.value);
+          this.emitChangeEvent(checked);
         }
         e.target.checked = Boolean(this.value);
       };

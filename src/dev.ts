@@ -98,9 +98,10 @@ function renderHTML(schema: any) {
 }
 
 // renderSchema(examples.table);
-renderSchema(examples.nakedTable);
+renderSchema(examples.simple);
+// renderSchema(examples.nakedTable);
 // renderSchema(examples.deepObject);
 // renderSchema(examples.objectInArray);
 // renderSchema(examples.constraints);
 // renderSchema(examples.oneOfEach);
-renderHTML(examples.table);
+// renderHTML(examples.table);
