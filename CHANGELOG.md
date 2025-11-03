@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.1.1](https://github.com/SuperFlyTV/ograf-form/compare/v0.1.0...v0.1.1) (2025-11-03)
+
+
+### Bug Fixes
+
+* issue with change event not firing ([3a64f85](https://github.com/SuperFlyTV/ograf-form/commit/3a64f8593667e9a45ed9ead336b8e963e2eac209))
+
 ## [0.1.0](https://github.com/SuperFlyTV/ograf-form/compare/v0.0.3...v0.1.0) (2025-10-22)
 
 
