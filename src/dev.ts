@@ -104,4 +104,4 @@ renderSchema(examples.simple);
 // renderSchema(examples.objectInArray);
 // renderSchema(examples.constraints);
 // renderSchema(examples.oneOfEach);
-// renderHTML(examples.table);
+renderHTML(examples.table);
