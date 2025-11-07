@@ -65,7 +65,8 @@ export class GDDSelect extends GDDElementBase {
       }
     }
 
-    for (const elOption of this.elInput.children) {
+    for (let i = 0; i < this.elInput.children.length; i++) {
+      const elOption = this.elInput.children[i];
       if (!(elOption instanceof HTMLOptionElement)) continue;
       const option = this._options[elOption.getAttribute("value") || ""];
       if (!option) continue;

@@ -1,5 +1,5 @@
-import { isEqual } from "./lib";
-import type { GDDSchema } from "./types";
+import { isEqual } from "./lib.js";
+import type { GDDSchema } from "./types.js";
 
 export function validateDataSimple(
   schema: GDDSchema,

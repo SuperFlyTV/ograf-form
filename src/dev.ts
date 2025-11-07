@@ -1,6 +1,6 @@
 import "./style.css";
 import * as examples from "./exampleSchemas.js";
-import { SuperFlyTvOgrafDataForm } from "../lib/main.js";
+import { SuperFlyTvOgrafDataForm } from "./main.js";
 /*
   Note: This sets things up for Development!
   The actual components are in lib/*

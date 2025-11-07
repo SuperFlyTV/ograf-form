@@ -1,4 +1,4 @@
-import type { GDDSchema } from "../lib/lib/types.js";
+import type { GDDSchema } from "./lib/lib/types.js";
 
 export const simple: GDDSchema = {
   type: "object",

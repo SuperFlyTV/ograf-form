@@ -5,7 +5,7 @@ import {
   type GetGDDElementFunction,
 } from "./gdd-elements/lib/_base.js";
 
-import type { GDDSchema } from "../main.js";
+import type { GDDSchema } from "../../main.js";
 import {
   validateGDDSchema,
   getBasicType,
@@ -23,7 +23,7 @@ import {
   GDDInteger,
   GDDBoolean,
   GDDNumber,
-} from "../main.js";
+} from "../../main.js";
 
 export class SuperFlyTvOgrafDataForm extends HTMLElement {
   private elError = document.createElement("div");
