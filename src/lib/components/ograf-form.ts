@@ -1,16 +1,9 @@
+import { getDefaultDataFromSchema } from "../lib/default-data.js";
 import { assertNever, isEqual } from "../lib/lib.js";
+import { GDDSchema } from "../lib/types.js";
+import { validateGDDSchema } from "../lib/validate-schema.js";
 import {
-  DEFAULT_DICTIONARY,
-  type Dictionary,
-  type GetGDDElementFunction,
-} from "./gdd-elements/lib/_base.js";
-
-import type { GDDSchema } from "../../main.js";
-import {
-  validateGDDSchema,
   getBasicType,
-  getDefaultDataFromSchema,
-  GDDElementBase,
   GDDMultiLineText,
   GDDFilePath,
   GDDSelect,
@@ -23,7 +16,13 @@ import {
   GDDInteger,
   GDDBoolean,
   GDDNumber,
-} from "../../main.js";
+} from "./gdd-elements/index.js";
+import {
+  DEFAULT_DICTIONARY,
+  GDDElementBase,
+  type Dictionary,
+  type GetGDDElementFunction,
+} from "./gdd-elements/lib/_base.js";
 
 export class SuperFlyTvOgrafDataForm extends HTMLElement {
   private elError = document.createElement("div");
