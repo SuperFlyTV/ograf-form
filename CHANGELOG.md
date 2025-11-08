@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [0.1.2](https://github.com/SuperFlyTV/ograf-form/compare/v0.1.1...v0.1.2) (2025-11-08)
+
+
+### Bug Fixes
+
+* restructure imports, so not using them before declaration ([3b82365](https://github.com/SuperFlyTV/ograf-form/commit/3b82365add444d4b3d283845c16b58a74a38ddf4))
+* rework to include types in dist ([bd5e354](https://github.com/SuperFlyTV/ograf-form/commit/bd5e354b9aaa449b692eb4817b07ff991b826aba))
+
 ## [0.1.1](https://github.com/SuperFlyTV/ograf-form/compare/v0.1.0...v0.1.1) (2025-11-03)
 
 
