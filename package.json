@@ -3,7 +3,7 @@
   "version": "0.1.2",
   "type": "module",
   "main": "./dist/main.js",
-  "types": "./dist/lib/main.d.ts",
+  "types": "./dist/main.d.ts",
   "description": "A web component for generating forms from OGraf/GDD schemas.",
   "license": "MIT",
   "author": {
