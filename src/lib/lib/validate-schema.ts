@@ -14,7 +14,7 @@ function validateProperties(
   properties: {
     [key: string]: GDDSchema;
   },
-  key: string
+  key: string,
 ) {
   if (key) key += ".";
 
@@ -38,21 +38,23 @@ function validateProperty(property: GDDSchema, key: string) {
 
   let baseType: JSONSchema7TypeName;
 
-  if (typeof property.type === "string") {
-    baseType = property.type;
-  } else if (Array.isArray(property.type)) {
+  // const propertyType = property.type  as string | string[];
+
+  if (Array.isArray(property.type)) {
     if (property.type.length === 1) {
       // nothing
     } else if (property.type.length === 2) {
       if (property.type[1] !== "null")
         throw new Error(
-          `${key}: Second element of property "type" must be "null"`
+          `${key}: Second element of property "type" must be "null"`,
         );
     } else
       throw new Error(
-        `${key}: Property "type" must be an array of length 1 or 2`
+        `${key}: Property "type" must be an array of length 1 or 2`,
       );
     baseType = property.type[0];
+  } else if (typeof property.type === "string") {
+    baseType = property.type;
   } else
     throw new Error(`${key}: Property "type" must be a string or an array`);
 
@@ -60,7 +62,7 @@ function validateProperty(property: GDDSchema, key: string) {
     throw new Error(
       `${key}: First element of property "type" has value "${
         property.type[0]
-      }", which is not one of the valid ones (${typeValues.join(", ")})`
+      }", which is not one of the valid ones (${typeValues.join(", ")})`,
     );
 
   if (property.gddType) {

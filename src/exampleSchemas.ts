@@ -20,6 +20,13 @@ export const table: GDDSchema = {
       default: "My Table",
       description: "This is the name of the thing",
     },
+    myHiddenProp: {
+      type: "string",
+      gddType: "single-line",
+      default: "--hidden--",
+      description: "This is a HIDDEN property that should not be rendered",
+      hidden: true,
+    },
 
     table: {
       description: "this is a nice table!",

@@ -1,22 +1,28 @@
+import { GDDSchema } from "../../../lib/types.js";
 import { GDDElementBase, isCustomEventKey } from "../lib/_base.js";
 import { getBasicType, renderContentError } from "../lib/lib.js";
 
 export class GDDObject extends GDDElementBase {
   private content: Record<string, GDDElementBase> = {};
 
-  render(): boolean {
-    if (!this.value) this.value = {};
-
-    const properties = Object.entries(this.schema?.properties ?? {}).sort(
-      (a, b) => {
-        const aRank = a[1].rank ?? 0;
-        const bRank = b[1].rank ?? 0;
+  private getProperties(): [string, GDDSchema][] {
+    return Object.entries<GDDSchema>(this.schema?.properties ?? {})
+      .filter((p) => {
+        return !p[1].hidden;
+      })
+      .sort((a, b) => {
+        const aRank = a[1].order ?? a[1].rank ?? 0;
+        const bRank = a[1].rank ?? b[1].rank ?? 0;
 
         if (aRank > bRank) return 1;
         if (aRank < bRank) return -1;
         return 0;
-      }
-    );
+      });
+  }
+  render(): boolean {
+    if (!this.value) this.value = {};
+
+    const properties = this.getProperties();
 
     const existingKeys = new Set();
     for (const [key, schema] of properties) {
