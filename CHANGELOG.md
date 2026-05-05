@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [commit-and-tag-version](https://github.com/absolute-version/commit-and-tag-version) for commit guidelines.
 
+## [1.0.0](https://github.com/SuperFlyTV/ograf-form/compare/v0.1.3...v1.0.0) (2026-05-05)
+
+
+### Bug Fixes
+
+* support for GDD properties order & hidden ([c6dcc3e](https://github.com/SuperFlyTV/ograf-form/commit/c6dcc3ea2a6d356388a2a95b12daa5a47a8ce1d9))
+
 ## [0.1.3](https://github.com/SuperFlyTV/ograf-form/compare/v0.1.2...v0.1.3) (2025-11-14)
 
 
