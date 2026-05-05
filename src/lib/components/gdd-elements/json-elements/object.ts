@@ -122,7 +122,7 @@ export class GDDObjectProperty extends GDDElementBase {
           renderContentError(
             this.content.contentError,
             this.schema,
-            e.detail.value
+            e.detail.value,
           );
         }
       });
@@ -131,7 +131,7 @@ export class GDDObjectProperty extends GDDElementBase {
           renderContentError(
             this.content.contentError,
             this.schema,
-            e.detail.value
+            e.detail.value,
           );
         }
       });

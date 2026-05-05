@@ -17,6 +17,7 @@ import {
   GDDBoolean,
   GDDNumber,
 } from "./gdd-elements/index.js";
+import { GDDUnknown } from "./gdd-elements/json-elements/unknown.js";
 import {
   DEFAULT_DICTIONARY,
   GDDElementBase,
@@ -81,7 +82,7 @@ export class SuperFlyTvOgrafDataForm extends HTMLElement {
   set value(value: any) {
     this.setAttribute(
       "value",
-      typeof value === "string" ? value : JSON.stringify(value)
+      typeof value === "string" ? value : JSON.stringify(value),
     );
   }
 
@@ -99,7 +100,7 @@ export class SuperFlyTvOgrafDataForm extends HTMLElement {
   set dictionary(value: Partial<Dictionary>) {
     this.setAttribute(
       "dictionary",
-      typeof value === "string" ? value : JSON.stringify(value)
+      typeof value === "string" ? value : JSON.stringify(value),
     );
   }
   public getGDDElement?: GetGDDElementFunctionOptional;
@@ -120,6 +121,8 @@ export class SuperFlyTvOgrafDataForm extends HTMLElement {
     const gddType = props.schema.gddType + "/";
 
     // Go through types in order of most specific to least specific:
+
+    if (basicType === null) return new GDDUnknown(options);
 
     if (basicType === "string" && gddType.startsWith("multi-line/"))
       return new GDDMultiLineText(options);
@@ -154,7 +157,9 @@ export class SuperFlyTvOgrafDataForm extends HTMLElement {
 
     // else:
     assertNever(basicType);
-    throw new Error(`Unsupported GDD type: ${basicType}`);
+
+    console.error(`Unsupported GDD type: ${basicType}`, props.schema);
+    return new GDDUnknown(options);
   };
 
   attributeChangedCallback(name: string, _oldValue: any, _newValue: any): void {
@@ -214,7 +219,7 @@ export class SuperFlyTvOgrafDataForm extends HTMLElement {
           // Re-emit the event, so that the target becomes this form:
           e.stopPropagation();
           this.dispatchEvent(
-            GDDElementBase.getKeyUpEvent(e, e.detail.valueStr, this.value)
+            GDDElementBase.getKeyUpEvent(e, e.detail.valueStr, this.value),
           );
         });
       }
@@ -257,7 +262,7 @@ export class SuperFlyTvOgrafDataForm extends HTMLElement {
 }
 
 export type GetGDDElementFunctionOptional = (
-  props: Parameters<GetGDDElementFunction>[0]
+  props: Parameters<GetGDDElementFunction>[0],
 ) => GDDElementBase | undefined;
 
 window.customElements.define("superflytv-ograf-form", SuperFlyTvOgrafDataForm);

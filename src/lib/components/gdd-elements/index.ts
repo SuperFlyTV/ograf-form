@@ -1,6 +1,8 @@
 export { getBasicType } from "./lib/lib.js";
 
 export { GDDElementBase } from "./lib/_base.js";
+export { GDDInputBase } from "./json-elements/_inputBase.js";
+export { GDDInputNumberBase } from "./json-elements/_inputNumberBase.js";
 export { GDDArray } from "./json-elements/array.js";
 export { GDDBoolean } from "./json-elements/boolean.js";
 export { GDDInteger } from "./json-elements/integer.js";

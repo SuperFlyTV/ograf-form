@@ -3678,17 +3678,17 @@ __metadata:
     "@types/json-schema": "npm:^7.0.15"
     commit-and-tag-version: "npm:^12.6.0"
     http-server: "npm:^14.1.1"
-    ograf: "npm:^0.0.5"
+    ograf: "npm:^1.2.0"
     typescript: "npm:~5.8.3"
     vite: "npm:^7.1.7"
     vite-plugin-dts: "npm:^4.5.4"
   languageName: unknown
   linkType: soft
 
-"ograf@npm:^0.0.5":
-  version: 0.0.5
-  resolution: "ograf@npm:0.0.5"
-  checksum: 10c0/46969eff7821c9d16729b7013d84e9fde3369b10274d6522ca5f50fd7f060b8bbff328ab65d14d933acbf83af6926fa80e4f899da8c07fd11dd8fad1258ddcb9
+"ograf@npm:^1.2.0":
+  version: 1.2.0
+  resolution: "ograf@npm:1.2.0"
+  checksum: 10c0/ba40d84993be90392d3cd17cf9f6695edcbe41c37055c72eef9edfdaffeb2a0030e66fea608b34a045f391bdac05eb647cd66969d0b9f9d7b7a66133fab835ca
   languageName: node
   linkType: hard
 

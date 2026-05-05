@@ -4,7 +4,7 @@ import { validateDataSimple } from "../../../lib/validate-data.js";
 export function renderContentError(
   elError: HTMLDivElement,
   schema: GDDSchema,
-  value: any
+  value: any,
 ): void {
   const errors = validateDataSimple(schema, value, "");
 
@@ -56,6 +56,11 @@ export function getLeastSignificantPower(num: number): number {
   return 1 / factor;
 }
 
-export function getBasicType(schemaType: GDDSchema["type"]): GDDTypeName {
-  return Array.isArray(schemaType) ? schemaType[0] : schemaType;
+export function getBasicType(
+  schemaType: GDDSchema["type"],
+): GDDTypeName | null {
+  const basicType = Array.isArray(schemaType) ? schemaType[0] : schemaType;
+
+  if (basicType === "null") return null;
+  return basicType;
 }

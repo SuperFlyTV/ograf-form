@@ -1,24 +1,27 @@
 import type { JSONSchema7 } from "json-schema";
 
+import type { GraphicsManifest } from "ograf";
+
+type GDDSchema0 = GraphicsManifest["schema"];
+
 // This is an incomplete GDDSchema definition,,
 export type GDDSchema = Omit<
   JSONSchema7,
   "type" | "properties" | "items" | "contains"
-> & {
-  type: GDDTypeName | [GDDTypeName] | [GDDTypeName, "null"];
-  properties?: { [key: string]: GDDSchema };
-  items?: GDDSchema;
+> &
+  GDDSchema0 & {
+    type: GDDTypeName | [GDDTypeName] | [GDDTypeName, "null"];
+    properties?: { [key: string]: GDDSchema };
+    items?: GDDSchema;
 
-  gddType?: string;
-  gddOptions?: Record<string, any>;
+    gddType?: string;
+    gddOptions?: Record<string, any>;
 
-  rank?: number; // Upcoming feature: to order properties in the UI
-
-  contains?: GDDSchema;
-};
+    contains?: GDDSchema;
+  };
 
 export function isGDDSpecificSchema(
-  schema: GDDSchema
+  schema: GDDSchema,
 ): schema is GDDSpecificSchemas {
   return typeof schema.gddType === "string";
 }
